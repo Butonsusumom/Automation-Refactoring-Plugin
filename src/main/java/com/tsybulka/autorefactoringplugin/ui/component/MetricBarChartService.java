@@ -2,7 +2,6 @@ package com.tsybulka.autorefactoringplugin.ui.component;
 
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.util.ui.UIUtil;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
@@ -41,7 +40,7 @@ public class MetricBarChartService {
 
 		java.util.List<ClassMetrics> classMetrics = smellsInfo.getClassMetricsList();
 		java.util.List<String> xData = Arrays.stream(SmellType.values()).map(SmellType::getValue).collect(Collectors.toList());
-		java.util.List<Double> yData = new ArrayList<Double>();
+		java.util.List<Double> yData = new ArrayList<>();
 
 		int totalLOC = getTotalLOC(classMetrics);
 		yData.add(calculateSmellDensity(smellsInfo.getTotalImplementationSmells(), totalLOC));
@@ -78,8 +77,8 @@ public class MetricBarChartService {
 	/**
 	 * Calculates code smell type density
 	 *
-	 * @param totalSmell
-	 * @param totalLOC
+	 * @param totalSmell - total number of smells
+	 * @param totalLOC - total number of lines
 	 */
 	private Double calculateSmellDensity(int totalSmell, int totalLOC) {
 		if (totalLOC == 0) return 0.0; // Avoid division by zero

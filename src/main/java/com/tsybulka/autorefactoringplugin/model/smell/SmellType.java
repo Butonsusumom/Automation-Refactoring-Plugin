@@ -1,5 +1,8 @@
 package com.tsybulka.autorefactoringplugin.model.smell;
 
+import lombok.Getter;
+
+@Getter
 public enum SmellType {
 	ARCHITECTURE("Architecture"),
 	IMPLEMENTATION("Implementation"),
@@ -11,7 +14,4 @@ public enum SmellType {
 		this.value = value;
 	}
 
-	public String getValue() {
-		return value;
-	}
 }

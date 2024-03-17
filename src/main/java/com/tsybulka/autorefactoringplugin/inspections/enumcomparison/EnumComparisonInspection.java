@@ -9,6 +9,8 @@ import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * Finds a.equals(b) and Objects.equals(a,b) if a nd b enums
  */
@@ -50,7 +52,7 @@ public class EnumComparisonInspection extends AbstractBaseJavaLocalInspectionToo
 				PsiReferenceExpression methodExpression = expression.getMethodExpression();
 				String methodName = methodExpression.getReferenceName();
 				PsiMethod method = expression.resolveMethod();
-				boolean isObjectsMethod = method.getContainingClass().getQualifiedName().equals("java.util.Objects");
+				boolean isObjectsMethod = Objects.equals(method.getContainingClass().getQualifiedName(),"java.util.Objects");
 
 				if (methodName != null && methodName.equals("equals")) {
 					if (!isObjectsMethod) {

@@ -1,8 +1,11 @@
 package com.tsybulka.autorefactoringplugin.model.metric;
 
+import lombok.Getter;
+
 /**
  * Types of OOP metrics that are calculated for class
  */
+@Getter
 public enum ClassMetricType {
 	LINES_OF_CODE("LOC"),
 	NUMBER_OF_FIELDS("NOF"),
@@ -22,7 +25,4 @@ public enum ClassMetricType {
 		this.value = value;
 	}
 
-	public String getValue() {
-		return value;
-	}
 }

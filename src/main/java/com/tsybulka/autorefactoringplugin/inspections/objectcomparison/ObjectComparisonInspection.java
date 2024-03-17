@@ -38,9 +38,9 @@ public class ObjectComparisonInspection extends AbstractBaseJavaLocalInspectionT
 		return type instanceof PsiClassType;
 	}
 
-	private boolean isEnum(PsiType type) {
+	private boolean isNotEnum(PsiType type) {
 		PsiClass psiClass = PsiUtil.resolveClassInType(type);
-		return psiClass != null && psiClass.isEnum();
+		return psiClass == null || !psiClass.isEnum();
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class ObjectComparisonInspection extends AbstractBaseJavaLocalInspectionT
 					PsiType lType = lOperand.getType();
 					PsiType rType = rOperand.getType();
 
-					if ((isObject(lType) && !isEnum(lType))|| (isObject(rType)&&!isEnum(rType))) {
+					if ((isObject(lType) && isNotEnum(lType))|| (isObject(rType)&& isNotEnum(rType))) {
 						holder.registerProblem(expression, DESCRIPTION, quickFix);
 					}
 				}
