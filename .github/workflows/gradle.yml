@@ -52,7 +52,7 @@ jobs:
     # - name: Build with Gradle 8.5
     #   run: gradle build
     
-  sonar:
+  code_analyses:
   
     needs: build
     runs-on: ubuntu-latest
@@ -60,16 +60,14 @@ jobs:
       contents: read
 
     steps:
-    # SonarQube analysis
-    - name: Sonar-Scanner action
-      uses: LowCostCustoms/sonar-scanner-action@v2
-      with:
-        sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
-        sonar-login: ${{ secrets.SONAR_TOKEN }}
+      - name: CodeThreat Scanner
+      # You may pin to the exact commit or the version.
+      # uses: CodeThreat/codethreat-github-action@972fb5cff9236c9e09944fa54022bc3ee56a0e61
+        uses: CodeThreat/codethreat-github-action@v1.020
 
   dependency-submission:
 
-    needs: sonar
+    needs: code_analyses
     runs-on: ubuntu-latest
     permissions:
       contents: write
