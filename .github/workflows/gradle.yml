@@ -60,10 +60,8 @@ jobs:
       contents: read
 
     steps:
-      - name: CodeThreat Scanner
-      # You may pin to the exact commit or the version.
-      # uses: CodeThreat/codethreat-github-action@972fb5cff9236c9e09944fa54022bc3ee56a0e61
-        uses: CodeThreat/codethreat-github-action@v1.020
+    - name: Official SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v2.0.1
 
   dependency-submission:
 
