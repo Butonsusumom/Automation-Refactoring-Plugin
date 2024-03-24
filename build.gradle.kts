@@ -1,6 +1,8 @@
+
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.17.2"
+    id("jacoco")
 }
 
 group = "com.tsybulka"
@@ -38,6 +40,18 @@ tasks {
     withType<JavaCompile> {
         sourceCompatibility = "8"
         targetCompatibility = "8"
+    }
+
+    test {
+        finalizedBy(jacocoTestReport)
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required.set(false)
+            csv.required.set(false)
+            html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml") as DirectoryProperty)
+        }
     }
 
     patchPluginXml {
