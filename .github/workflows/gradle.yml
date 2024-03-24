@@ -51,13 +51,25 @@ jobs:
     #
     # - name: Build with Gradle 8.5
     #   run: gradle build
+    
+  sonar:
+  
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
+    steps:
     # SonarQube analysis
     - name: Sonar-Scanner action
       uses: LowCostCustoms/sonar-scanner-action@v2
+      with:
+        sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+        sonar-login: ${{ secrets.SONAR_TOKEN }}
 
   dependency-submission:
 
+    needs: sonar
     runs-on: ubuntu-latest
     permissions:
       contents: write
