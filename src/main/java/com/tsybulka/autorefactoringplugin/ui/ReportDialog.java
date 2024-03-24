@@ -1,6 +1,7 @@
 package com.tsybulka.autorefactoringplugin.ui;
 
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 
@@ -20,6 +21,7 @@ import com.tsybulka.autorefactoringplugin.model.smell.codesmell.TestSmell;
 import com.tsybulka.autorefactoringplugin.ui.component.MetricBarChartService;
 import com.tsybulka.autorefactoringplugin.ui.component.MetricPieChartService;
 import com.tsybulka.autorefactoringplugin.ui.component.SmellTableService;
+import com.tsybulka.autorefactoringplugin.ui.component.TextAreaRenderer;
 import org.knowm.xchart.*;
 
 public class ReportDialog extends JDialog {
@@ -118,8 +120,8 @@ public class ReportDialog extends JDialog {
 		titleLabel.setText(ARCHITECTURE_SMELLS_TITLE);
 		List<ArchitectureSmell> architectureSmellList = smellsInfo.getArchitectureSmellList();
 		HashMap<String, Integer> frequencyMap = new HashMap<>();
-		List<Number> pieChartData = new ArrayList<Number>();
-		List<String> pieChartLabels = new ArrayList<String>();
+		List<Number> pieChartData = new ArrayList<>();
+		List<String> pieChartLabels = new ArrayList<>();
 		for (ArchitectureSmell smell : architectureSmellList) {
 			String smellName = smell.getName();
 			if (frequencyMap.containsKey(smellName)) {
@@ -270,7 +272,7 @@ public class ReportDialog extends JDialog {
 	}
 
 	public void showSmellsWithFrequency(HashMap<String, Integer> frequencyMap) {
-		JTable table = new JTable();
+		JTable table = new JBTable();
 		table.setBackground(UIUtil.getPanelBackground());
 		table.setCellSelectionEnabled(false);
 		table.setColumnSelectionAllowed(false);
@@ -284,6 +286,10 @@ public class ReportDialog extends JDialog {
 		table.setModel(model);
 		model.addColumn(SMELL_TYPE_COLUMN);
 		model.addColumn(FREQUENCY_COLUMN);
+
+		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(250);
+		table.getColumn(SMELL_TYPE_COLUMN).setCellRenderer(new TextAreaRenderer());
+
 		if (frequencyMap.keySet().isEmpty()) {
 			Object[] row = new Object[1];
 			row[0] = "No smells detected for this type";

@@ -37,5 +37,14 @@ public class ProjectSmellsInfo {
 	@Builder.Default
 	private Integer totalArchitectureSmells = 0;
 
+	public ProjectSmellsInfo(List<ImplementationSmell> implementationSmellsList, List<ArchitectureSmell> architectureSmellList, List<TestSmell> testSmellsList, List<ClassMetrics> classMetricsList) {
+		this.implementationSmellsList = implementationSmellsList;
+		this.architectureSmellList = architectureSmellList;
+		this.testSmellsList = testSmellsList;
+		this.classMetricsList = classMetricsList;
+		this.totalImplementationSmells = implementationSmellsList.size();
+		this.totalTestSmells = testSmellsList.size();
+		this.totalArchitectureSmells = architectureSmellList.size();
+	}
 }
 

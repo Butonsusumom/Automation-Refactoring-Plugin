@@ -53,17 +53,26 @@ public class SmellTableService {
 		model.addColumn(METHOD_COLUMN);
 		model.addColumn(DESCRIPTION_COLUMN);
 
+		table.getColumn(DESCRIPTION_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(SMELL_TYPE_COLUMN).setCellRenderer(new TextAreaRenderer());
+
+		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(170);
+		table.getColumn(DESCRIPTION_COLUMN).setPreferredWidth(300);
+
 		for (ImplementationSmell smell : implementationSmellList) {
 			Object[] row = new Object[5];
 
 			row[0] = smell.getName();
-			row[1] = smell.getClassName();
+			row[1] = smell.getClassPackage();
 			row[2] = smell.getClassName();
 			row[3] = smell.getMethodName();
 			row[4] = smell.getDescription();
 
 			model.addRow(row);
 		}
+
+		// Adjusting row height based on the content
+		adjustRowHeights(table);
 
 		return showTable(panel, table);
 	}
@@ -117,7 +126,7 @@ public class SmellTableService {
 			Object[] row = new Object[5];
 
 			row[0] = smell.getName();
-			row[1] = smell.getClassName();
+			row[1] = smell.getClassPackage();
 			row[2] = smell.getClassName();
 			row[3] = smell.getMethodName();
 			row[4] = smell.getDescription();
@@ -131,7 +140,7 @@ public class SmellTableService {
 		JScrollPane scrollPane = new JBScrollPane(table);
 		scrollPane.setPreferredSize(new Dimension(900, 150));
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder(0,20,0,20));
+		scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 		panel.setLayout(new BorderLayout());
 		panel.add(scrollPane, BorderLayout.CENTER);
 		panel.revalidate();
@@ -155,4 +164,16 @@ public class SmellTableService {
 		panel.removeAll();
 		return table;
 	}
+
+	private void adjustRowHeights(JTable table) {
+		for (int row = 0; row < table.getRowCount(); row++) {
+			int rowHeight = table.getRowHeight();
+			for (int column = 0; column < table.getColumnCount(); column++) {
+				Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
+				rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+			}
+			table.setRowHeight(row, rowHeight);
+		}
+	}
+
 }

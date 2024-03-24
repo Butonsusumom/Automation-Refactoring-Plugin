@@ -1,6 +1,7 @@
 package com.tsybulka.autorefactoringplugin.ui.component;
 
 import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
@@ -14,6 +15,7 @@ import org.knowm.xchart.style.Styler;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,12 +32,12 @@ public class MetricBarChartService {
 
 		Color annotationColor = EditorColorsManager.getInstance().getGlobalScheme().getDefaultForeground();
 		Color backgroundColor = UIUtil.getPanelBackground();
-		Color[] sliceColors = new Color[]{
-				new Color(34, 42, 134),
-				new Color(58, 65, 148),
-				new Color(83, 89, 161),
-				new Color(107, 113, 175),
-				new Color(132, 137, 188)
+		JBColor[] sliceColors = new JBColor[]{
+				new JBColor(new Color(95, 105, 210), new Color(34, 42, 134)),
+				new JBColor(new Color(130, 130, 220), new Color(58, 65, 148)),
+				new JBColor(new Color(150, 155, 230), new Color(83, 89, 161)),
+				new JBColor(new Color(165, 170, 240), new Color(107, 113, 175)),
+				new JBColor(new Color(180, 185, 250), new Color(132, 137, 188))
 		};
 
 		java.util.List<ClassMetrics> classMetrics = smellsInfo.getClassMetricsList();
@@ -43,11 +45,15 @@ public class MetricBarChartService {
 		java.util.List<Double> yData = new ArrayList<>();
 
 		int totalLOC = getTotalLOC(classMetrics);
-		yData.add(calculateSmellDensity(smellsInfo.getTotalImplementationSmells(), totalLOC));
 		yData.add(calculateSmellDensity(smellsInfo.getTotalArchitectureSmells(), totalLOC));
+		yData.add(calculateSmellDensity(smellsInfo.getTotalImplementationSmells(), totalLOC));
 		yData.add(calculateSmellDensity(smellsInfo.getTotalTestSmells(), totalLOC));
 
-		chart.addSeries(SMELL_DENSITY_TITLE, xData, yData);
+		// Create a separate series for each smell type
+		chart.addSeries("Architecture Smells", Collections.singletonList(xData.get(0)), Collections.singletonList(calculateSmellDensity(smellsInfo.getTotalArchitectureSmells(), totalLOC)));
+		chart.addSeries("Implementation Smells", Collections.singletonList(xData.get(1)), Collections.singletonList(calculateSmellDensity(smellsInfo.getTotalImplementationSmells(), totalLOC)));
+		chart.addSeries("Test Smells", Collections.singletonList(xData.get(2)), Collections.singletonList(calculateSmellDensity(smellsInfo.getTotalTestSmells(), totalLOC)));
+
 
 		chart.getStyler().setSeriesColors(sliceColors);
 		chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);

@@ -1,4 +1,4 @@
-package com.tsybulka.autorefactoringplugin.inspections.oopmetrics;
+package com.tsybulka.autorefactoringplugin.inspections.projectanalyses;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
@@ -10,6 +10,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
@@ -46,13 +47,93 @@ public class MetricsCalculationService {
 		metrics.put(ClassMetricType.WEIGHT_METHODS, calculateWmc(psiClass));
 		metrics.put(ClassMetricType.NUMBER_OF_CHILDREN, calculateNumberOfChildren(psiClass, project));
 		metrics.put(ClassMetricType.DEPTH_OF_INHERITANCE_TREE, calculateDepthOfInheritanceTree(psiClass));
-		// LACK_OF_COHESION_IN_METHODS and other metrics would need specific implementations
-		metrics.put(LACK_OF_COHESION_IN_METHOD, 0);
-		metrics.put(ClassMetricType.FAN_IN, 0);
-		metrics.put(ClassMetricType.FAN_OUT, 0);
+		metrics.put(LACK_OF_COHESION_IN_METHOD, calculateLackOfCohesionInMethods(psiClass));
+		metrics.put(ClassMetricType.FAN_IN, calculateFanIn(psiClass, project));
+		metrics.put(ClassMetricType.FAN_OUT, calculateFanOut(psiClass));
 
 		return metrics;
 	}
+
+	public int calculateFanIn(PsiClass psiClass, Project project) {
+		Set<PsiClass> uniqueClassesReferencing = new HashSet<>();
+		for (PsiMethod method : psiClass.getMethods()) {
+			Query<PsiReference> query = ReferencesSearch.search(method, GlobalSearchScope.projectScope(project));
+			for (PsiReference reference : query) {
+				PsiElement element = reference.getElement();
+				if (element instanceof PsiMethodCallExpression) {
+					PsiMethod callingMethod = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
+					if (callingMethod != null) {
+						PsiClass containingClass = callingMethod.getContainingClass();
+						if (containingClass != null && !containingClass.equals(psiClass)) {
+							uniqueClassesReferencing.add(containingClass);
+						}
+					}
+				}
+			}
+		}
+		return uniqueClassesReferencing.size();
+	}
+
+	public int calculateFanOut(PsiClass psiClass) {
+		Set<PsiClass> uniqueClassesCalled = new HashSet<>();
+		for (PsiMethod method : psiClass.getMethods()) {
+			for (PsiReference reference : ReferencesSearch.search(method)) {
+				PsiElement element = reference.getElement();
+				if (element instanceof PsiMethodCallExpression) {
+					PsiMethod calledMethod = ((PsiMethodCallExpression)element).resolveMethod();
+					if (calledMethod != null) {
+						PsiClass containingClass = calledMethod.getContainingClass();
+						if (containingClass != null && !containingClass.equals(psiClass)) {
+							uniqueClassesCalled.add(containingClass);
+						}
+					}
+				}
+			}
+		}
+		return uniqueClassesCalled.size();
+	}
+
+	private int calculateLackOfCohesionInMethods(PsiClass psiClass) {
+		// Simplified version: Count methods that do not share fields with other methods
+		// This is a very basic approximation
+		int sharedFields = 0;
+		int totalMethodPairs = 0;
+		PsiMethod[] methods = psiClass.getMethods();
+
+		for (int i = 0; i < methods.length; i++) {
+			for (int j = i + 1; j < methods.length; j++) {
+				if (methodsShareField(methods[i], methods[j])) {
+					sharedFields++;
+				}
+				totalMethodPairs++;
+			}
+		}
+
+		return totalMethodPairs - sharedFields; // Simplified LCOM
+	}
+
+	private boolean methodsShareField(PsiMethod method1, PsiMethod method2) {
+		Set<String> fields1 = extractFieldNames(method1);
+		Set<String> fields2 = extractFieldNames(method2);
+		fields1.retainAll(fields2); // Intersection of fields1 and fields2
+		return !fields1.isEmpty();
+	}
+
+	private Set<String> extractFieldNames(PsiMethod method) {
+		final Set<String> fieldNames = new HashSet<>();
+		method.accept(new JavaRecursiveElementVisitor() {
+			@Override
+			public void visitReferenceExpression(PsiReferenceExpression expression) {
+				super.visitReferenceExpression(expression);
+				if (expression.resolve() instanceof PsiField) {
+					PsiField field = (PsiField) expression.resolve();
+					fieldNames.add(field.getName());
+				}
+			}
+		});
+		return fieldNames;
+	}
+
 
 	private int calculateLinesOfCode(PsiClass psiClass) {
 		PsiFile containingFile = psiClass.getContainingFile();
