@@ -187,7 +187,6 @@ public class MetricsCalculationService {
 		return depth - 1; // Subtract 1 to exclude the class itself
 	}
 
-
 	List<PsiClass> getProjectClasses(Project project) {
 		List<PsiClass> userClasses = new ArrayList<>();
 		PsiManager psiManager = PsiManager.getInstance(project);
