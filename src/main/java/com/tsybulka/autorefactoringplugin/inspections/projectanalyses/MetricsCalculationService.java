@@ -134,7 +134,6 @@ public class MetricsCalculationService {
 		return fieldNames;
 	}
 
-
 	private int calculateLinesOfCode(PsiClass psiClass) {
 		PsiFile containingFile = psiClass.getContainingFile();
 		return (containingFile == null) ? 0 : StringUtil.countNewLines(containingFile.getText()) + 1;
