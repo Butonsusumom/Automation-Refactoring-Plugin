@@ -1,3 +1,5 @@
+[![Java CI with Gradle](https://github.com/Butonsusumom/Automation-Refactoring-PLugin/actions/workflows/gradle.yml/badge.svg?branch=master)](https://github.com/Butonsusumom/Automation-Refactoring-PLugin/actions/workflows/gradle.yml)
+
 # Refactoring Plugin
 
 Welcome to the Refactoring Plugin repository! This powerful tool is designed to enhance the refactoring process within your IDE, ensuring cleaner, more maintainable, and efficient code. With features like code smell detection, automatic refactoring suggestions, and customizable refactoring rules, this plugin is an essential addition to your development toolkit.
