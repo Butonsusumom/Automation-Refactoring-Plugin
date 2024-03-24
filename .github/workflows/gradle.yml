@@ -9,9 +9,11 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - '**' # Matches all branches
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - '**' # Matches all branches
 
 jobs:
   build:
