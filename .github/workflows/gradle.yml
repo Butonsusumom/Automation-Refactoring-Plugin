@@ -72,8 +72,8 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew build
     
-    - name: Run tests
-      run: ./gradlew test
+    - name: Run tests with Gradle
+      run: ./gradlew test jacocoTestReport
 
     - name: Archive coverage data
       uses: actions/upload-artifact@v2
