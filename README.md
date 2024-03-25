@@ -1,4 +1,4 @@
-[![Java CI with Gradle](https://github.com/Butonsusumom/Automation-Refactoring-PLugin/actions/workflows/gradle.yml/badge.svg?branch=master)](https://github.com/Butonsusumom/Automation-Refactoring-PLugin/actions/workflows/gradle.yml)
+[![Java CI with Gradle](https://github.com/Butonsusumom/Automation-Refactoring-PLugin/actions/workflows/gradle.yml/badge.svg)](https://github.com/Butonsusumom/Automation-Refactoring-PLugin/actions/workflows/gradle.yml)
 
 # Refactoring Plugin
 
