@@ -94,7 +94,7 @@ jobs:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
         pr-mode: true # Enable the pull-request mode
-        args: "-i,build/reports/jacoco,--linter,jetbrains/qodana-jvm:2023.3-eap"
+        args: "-i,build/reports/jacoco"
 
   dependency-submission:
 
