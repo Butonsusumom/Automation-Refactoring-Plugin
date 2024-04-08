@@ -94,7 +94,7 @@ jobs:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
         pr-mode: true # Enable the pull-request mode
-        args: "-p --coverage-dir /path/to/coverage/dir"
+        args: "-p --coverage-dir /build/reports/jacoco"
 
   dependency-submission:
 
