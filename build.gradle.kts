@@ -17,6 +17,7 @@ dependencies {
     implementation("org.projectlombok:lombok:1.18.28")
     testImplementation("junit:junit:4.13.2")
     implementation("org.knowm.xchart:xchart:3.8.7")
+    testImplementation("org.mockito:mockito-core:3.12.4")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     testCompileOnly("org.projectlombok:lombok:1.18.30")

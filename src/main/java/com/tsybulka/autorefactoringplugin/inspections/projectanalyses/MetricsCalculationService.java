@@ -37,23 +37,6 @@ public class MetricsCalculationService {
 		return classMetrics;
 	}
 
-	public HashMap<ClassMetricType, Integer> calculateOopMetrics(PsiClass psiClass, Project project) {
-		HashMap<ClassMetricType, Integer> metrics = new HashMap<>();
-		metrics.put(ClassMetricType.LINES_OF_CODE, calculateLinesOfCode(psiClass));
-		metrics.put(ClassMetricType.NUMBER_OF_FIELDS, calculateNumberOfFields(psiClass));
-		metrics.put(ClassMetricType.NUMBER_OF_PUBLIC_FIELDS, calculateNumberOfPublicFields(psiClass));
-		metrics.put(ClassMetricType.NUMBER_OF_METHODS, calculateNumberOfMethods(psiClass));
-		metrics.put(ClassMetricType.NUMBER_OF_PUBLIC_METHODS, calculateNumberOfPublicMethods(psiClass));
-		metrics.put(ClassMetricType.WEIGHT_METHODS, calculateWmc(psiClass));
-		metrics.put(ClassMetricType.NUMBER_OF_CHILDREN, calculateNumberOfChildren(psiClass, project));
-		metrics.put(ClassMetricType.DEPTH_OF_INHERITANCE_TREE, calculateDepthOfInheritanceTree(psiClass));
-		metrics.put(LACK_OF_COHESION_IN_METHOD, calculateLackOfCohesionInMethods(psiClass));
-		metrics.put(ClassMetricType.FAN_IN, calculateFanIn(psiClass, project));
-		metrics.put(ClassMetricType.FAN_OUT, calculateFanOut(psiClass));
-
-		return metrics;
-	}
-
 	public int calculateFanIn(PsiClass psiClass, Project project) {
 		Set<PsiClass> uniqueClassesReferencing = new HashSet<>();
 		for (PsiMethod method : psiClass.getMethods()) {
@@ -236,5 +219,22 @@ public class MetricsCalculationService {
 			}
 		}
 		return "";
+	}
+
+	private HashMap<ClassMetricType, Integer> calculateOopMetrics(PsiClass psiClass, Project project) {
+		HashMap<ClassMetricType, Integer> metrics = new HashMap<>();
+		metrics.put(ClassMetricType.LINES_OF_CODE, calculateLinesOfCode(psiClass));
+		metrics.put(ClassMetricType.NUMBER_OF_FIELDS, calculateNumberOfFields(psiClass));
+		metrics.put(ClassMetricType.NUMBER_OF_PUBLIC_FIELDS, calculateNumberOfPublicFields(psiClass));
+		metrics.put(ClassMetricType.NUMBER_OF_METHODS, calculateNumberOfMethods(psiClass));
+		metrics.put(ClassMetricType.NUMBER_OF_PUBLIC_METHODS, calculateNumberOfPublicMethods(psiClass));
+		metrics.put(ClassMetricType.WEIGHT_METHODS, calculateWmc(psiClass));
+		metrics.put(ClassMetricType.NUMBER_OF_CHILDREN, calculateNumberOfChildren(psiClass, project));
+		metrics.put(ClassMetricType.DEPTH_OF_INHERITANCE_TREE, calculateDepthOfInheritanceTree(psiClass));
+		metrics.put(LACK_OF_COHESION_IN_METHOD, calculateLackOfCohesionInMethods(psiClass));
+		metrics.put(ClassMetricType.FAN_IN, calculateFanIn(psiClass, project));
+		metrics.put(ClassMetricType.FAN_OUT, calculateFanOut(psiClass));
+
+		return metrics;
 	}
 }
