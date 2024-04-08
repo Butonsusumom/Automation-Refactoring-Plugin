@@ -55,7 +55,7 @@ tasks {
         reports {
             html.required.set(false)
             csv.required.set(false)
-            xml.outputLocation.set(File(".qodana/code-coverage"))
+            xml.outputLocation.set(layout.projectDirectory.file(".qodana/code-coverage/result.xml").asFile)
             xml.required.set(true)
         }
     }
