@@ -1,7 +1,7 @@
-
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.17.2"
+    id("org.jetbrains.kotlinx.kover") version "0.7.2"
     id("jacoco")
 }
 
@@ -22,6 +22,10 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+}
+
+jacoco {
+    toolVersion = "0.8.7" // Specify the version of JaCoCo
 }
 
 java {
@@ -49,9 +53,10 @@ tasks {
 
     jacocoTestReport {
         reports {
-            xml.required.set(false)
+            html.required.set(false)
             csv.required.set(false)
-            html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+            xml.outputLocation.set(File("$buildDir/reports/jacoco/report.xml"))
+            xml.required.set(true)
         }
     }
 
