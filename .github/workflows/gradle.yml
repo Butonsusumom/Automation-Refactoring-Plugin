@@ -65,22 +65,20 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
-    
+
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
-        java-version: '17'
-        distribution: 'adopt'
-        cache: 'gradle'
-        
-    - name: Grant execute permission for Gradle Wrapper
-      run: chmod +x ./gradlew
+          java-version: '17'
+          distribution: 'adopt'
+          cache: 'gradle'
 
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build
-    
-    - name: Run tests with Gradle
-      run: ./gradlew test jacocoTestReport
+    - name: Validate Gradle Wrapper
+      run: ./gradlew --version
+
+    - name: Run Tests
+      run: ./gradlew test
+      working-directory: JVM/intellij-coverage-agent/gradle
       
     - name: Archive coverage data
       uses: actions/upload-artifact@v2
@@ -93,6 +91,7 @@ jobs:
       env:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
+        args: "-i,.,--linter,jetbrains/qodana-jvm:latest"
         pr-mode: true # Enable the pull-request mode
 
   dependency-submission:
