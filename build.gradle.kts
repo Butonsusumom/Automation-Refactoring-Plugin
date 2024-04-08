@@ -55,7 +55,7 @@ tasks {
         reports {
             html.required.set(false)
             csv.required.set(false)
-            xml.outputLocation.set(File("$buildDir/reports/jacoco/report.xml"))
+            xml.outputLocation.set(File(".qodana/code-coverage"))
             xml.required.set(true)
         }
     }
