@@ -79,15 +79,14 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew build
     
-    - name: Run Tests
-      run: ./gradlew test
-      working-directory: JVM/jacoco/gradle
+    - name: Run tests with Gradle
+      run: ./gradlew test jacocoTestReport
       
     - name: Archive coverage data
       uses: actions/upload-artifact@v2
       with:
-        name: gradle-coverage-data-jacoco
-        path: JVM/jacoco/gradle/.qodana/code-coverage
+        name: jacoco-reports
+        path: build/jacocoHtml
           
     - name: Qodana Scan
       uses: JetBrains/qodana-action@v2023.3
@@ -96,6 +95,7 @@ jobs:
       with:
         pr-mode: true # Enable the pull-request mode
         args: "-i,JVM/jacoco/gradle,--linter,jetbrains/qodana-jvm:2023.3-eap"
+        quodana-args: -report-format JACOCO -report-path build/jacocoHtml
 
   dependency-submission:
 
