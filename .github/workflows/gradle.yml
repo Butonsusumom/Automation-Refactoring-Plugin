@@ -85,8 +85,8 @@ jobs:
     - name: Archive coverage data
       uses: actions/upload-artifact@v2
       with:
-        name: jacoco-reports
-        path: build/jacocoHtml
+        name: jacoco-report
+        path: build/jacocoXml/report.xml
           
     - name: Qodana Scan
       uses: JetBrains/qodana-action@v2023.3
@@ -94,7 +94,7 @@ jobs:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
         pr-mode: true # Enable the pull-request mode
-        args: -report-format JACOCO -report-path build/jacocoHtml
+        args: "-p --coverage-dir /path/to/coverage/dir"
 
   dependency-submission:
 
