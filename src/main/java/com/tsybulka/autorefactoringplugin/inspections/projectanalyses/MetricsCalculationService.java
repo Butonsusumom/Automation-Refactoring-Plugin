@@ -210,7 +210,7 @@ public class MetricsCalculationService {
 		return psiClass.getName();
 	}
 
-	String getFilePath(PsiClass psiClass) {
+	public String getFilePath(PsiClass psiClass) {
 		PsiFile containingFile = psiClass.getContainingFile();
 		if (containingFile != null) {
 			VirtualFile virtualFile = containingFile.getVirtualFile();

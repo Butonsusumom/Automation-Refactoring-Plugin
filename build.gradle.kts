@@ -30,6 +30,7 @@ jacoco {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -43,8 +44,8 @@ intellij {
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "8"
-        targetCompatibility = "8"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 
     test {
@@ -53,11 +54,13 @@ tasks {
     }
 
     jacocoTestReport {
+        dependsOn(test)
         reports {
-            html.required.set(false)
             csv.required.set(false)
-            xml.outputLocation.set(layout.projectDirectory.file(".qodana/code-coverage/result.xml").asFile)
+            html.required.set(true)
             xml.required.set(true)
+            html.outputLocation.set(layout.projectDirectory.dir(".qodana/code-coverage/resultHTML"))
+            xml.outputLocation.set(layout.projectDirectory.file(".qodana/code-coverage/result.xml").asFile)
         }
     }
 
