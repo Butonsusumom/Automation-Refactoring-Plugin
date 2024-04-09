@@ -1,7 +1,6 @@
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.17.2"
-    id("org.jetbrains.kotlinx.kover") version "0.7.2"
     id("jacoco")
 }
 
@@ -14,18 +13,19 @@ repositories {
 
 dependencies {
     implementation("org.projectlombok:lombok:1.18.28")
-    implementation("org.projectlombok:lombok:1.18.28")
-    testImplementation("junit:junit:4.13.2")
     implementation("org.knowm.xchart:xchart:3.8.7")
-    testImplementation("org.mockito:mockito-core:3.12.4")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
 jacoco {
-    toolVersion = "0.8.7" // Specify the version of JaCoCo
+    toolVersion = "0.8.7"
 }
 
 java {
@@ -48,6 +48,7 @@ tasks {
     }
 
     test {
+        useJUnitPlatform()
         finalizedBy(jacocoTestReport)
     }
 
