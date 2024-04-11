@@ -15,7 +15,6 @@ import org.knowm.xchart.style.Styler;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,11 +48,7 @@ public class MetricBarChartService {
 		yData.add(calculateSmellDensity(smellsInfo.getTotalImplementationSmells(), totalLOC));
 		yData.add(calculateSmellDensity(smellsInfo.getTotalTestSmells(), totalLOC));
 
-		// Create a separate series for each smell type
-		chart.addSeries("Architecture Smells", Collections.singletonList(xData.get(0)), Collections.singletonList(calculateSmellDensity(smellsInfo.getTotalArchitectureSmells(), totalLOC)));
-		chart.addSeries("Implementation Smells", Collections.singletonList(xData.get(1)), Collections.singletonList(calculateSmellDensity(smellsInfo.getTotalImplementationSmells(), totalLOC)));
-		chart.addSeries("Test Smells", Collections.singletonList(xData.get(2)), Collections.singletonList(calculateSmellDensity(smellsInfo.getTotalTestSmells(), totalLOC)));
-
+		chart.addSeries("Smells", xData, yData);
 
 		chart.getStyler().setSeriesColors(sliceColors);
 		chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);

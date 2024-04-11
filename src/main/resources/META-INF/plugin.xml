@@ -25,11 +25,6 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
 
-    <!-- Extension points defined by the plugin.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-    <extensions defaultExtensionNs="com.intellij">
-        <inspectionToolProvider implementation="com.tsybulka.autorefactoringplugin.inspections.CodeInspectionProvider"/>
-    </extensions>
     <actions>
         <action
                 id="StackOverflow.AskQuestion.ToolsMenu"
@@ -38,13 +33,32 @@
                 description="Ask a question on stack overflow">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+
         <action
                 id="Analyses.ReportDialogue"
                 class="com.tsybulka.autorefactoringplugin.actions.AnalyzeCodeAction"
-                text="Alanyze Project"
-                popup="true"
-                icon="/icons/pluginIcon.svg">
-        <add-to-group group-id="ToolsMenu" anchor="last"/>
+                text="Analyze Project"
+                icon="/icons/pluginIcon.svg"
+                popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+
     </actions>
+
+    <!-- Extension points defined by the plugin.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="com.tsybulka.autorefactoringplugin.settings.PluginSettings"/>
+
+        <inspectionToolProvider implementation="com.tsybulka.autorefactoringplugin.inspections.CodeInspectionProvider"/>
+
+        <projectConfigurable
+                id="AutoRefactoringPluginSettings"
+                parentId="tools"
+                displayName="AutoRefactor Plugin Settings"
+                instance="com.tsybulka.autorefactoringplugin.settings.PluginConfigurable">
+        </projectConfigurable>
+    </extensions>
+
 </idea-plugin>

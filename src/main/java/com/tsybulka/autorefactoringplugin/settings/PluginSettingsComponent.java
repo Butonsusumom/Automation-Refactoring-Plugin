@@ -1,0 +1,67 @@
+package com.tsybulka.autorefactoringplugin.settings;
+
+import com.esotericsoftware.kryo.NotNull;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.TitledSeparator;
+import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.FormBuilder;
+import lombok.Data;
+
+import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+
+@Data
+public class PluginSettingsComponent {
+
+	private JPanel settingsPanel;
+	@NotNull
+	private JCheckBox enumComparisonCheckBox = new JBCheckBox("Enum reference comparison check");
+	@NotNull
+	private JCheckBox objectComparisonCheckBox = new JBCheckBox("Objects content comparison check");
+	@NotNull
+	private JTextField cyclomaticComplexityNumericalField = new JBTextField();
+	@NotNull
+	private JLabel errorCyclomaticComplexityLabel = new JBLabel("<html>Methods with cyclomatic complexity over 20 are viewed as complex, potentially impacting maintainability.<br/> Please reduce maximum allowed cyclomatic complexity.</html>");
+
+	public PluginSettingsComponent() {
+		// Ensure numerical input only
+		((AbstractDocument) cyclomaticComplexityNumericalField.getDocument()).setDocumentFilter(new DocumentFilter() {
+			@Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+				if (string.matches("\\d*")) {
+					super.insertString(fb, offset, string, attr);
+				}
+			}
+
+			@Override
+			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+				if (text.matches("\\d*")) {
+					super.replace(fb, offset, length, text, attrs);
+				}
+			}
+		});
+
+		errorCyclomaticComplexityLabel.setForeground(JBColor.RED);
+		errorCyclomaticComplexityLabel.setVisible(false);
+
+		settingsPanel = FormBuilder.createFormBuilder()
+				.addComponent(new TitledSeparator("Method Complexity Settings"), 1)
+				.addLabeledComponent(new JBLabel("Maximum allowed cyclomatic complexity for methods: "), cyclomaticComplexityNumericalField, 1, false)
+				.addComponent(errorCyclomaticComplexityLabel, 1)
+				.addComponent(new TitledSeparator("Enable/Disable Code Inspections"), 1)
+				.addComponent(enumComparisonCheckBox, 1)
+				.addComponent(objectComparisonCheckBox, 1)
+				.addComponentFillVertically(new JPanel(), 0)
+				.getPanel();
+	}
+
+	public JPanel getPanel() {
+		return settingsPanel;
+	}
+
+}

@@ -3,6 +3,7 @@ package com.tsybulka.autorefactoringplugin.inspections.enumcomparison;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
+import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.ImplementationSmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
@@ -10,7 +11,7 @@ import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSm
 import java.util.List;
 import java.util.Objects;
 
-public class EnumComparisonVisitor extends JavaElementVisitor {
+public class EnumComparisonVisitor extends CodeInspectionVisitor {
 
 	private static final String NAME = InspectionsBundle.message("inspection.comparing.enums.references.display.name");
 	private static final String DESCRIPTION = InspectionsBundle.message("inspection.comparing.enums.references.problem.descriptor");
@@ -22,20 +23,28 @@ public class EnumComparisonVisitor extends JavaElementVisitor {
 	}
 
 	@Override
+	public boolean isInspectionEnabled() {
+		return settings.isEnumComparisonCheck();
+	}
+
+
+	@Override
 	public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-		super.visitMethodCallExpression(expression);
+		if (isInspectionEnabled()) {
+			super.visitMethodCallExpression(expression);
 
-		PsiReferenceExpression methodExpression = expression.getMethodExpression();
-		String methodName = methodExpression.getReferenceName();
-		PsiMethod method = expression.resolveMethod();
-		if (method != null && method.getContainingClass() != null) {
-			boolean isObjectsMethod = Objects.equals(method.getContainingClass().getQualifiedName(), "java.util.Objects");
+			PsiReferenceExpression methodExpression = expression.getMethodExpression();
+			String methodName = methodExpression.getReferenceName();
+			PsiMethod method = expression.resolveMethod();
+			if (method != null && method.getContainingClass() != null) {
+				boolean isObjectsMethod = Objects.equals(method.getContainingClass().getQualifiedName(), "java.util.Objects");
 
-			if ("equals".equals(methodName)) {
-				if (isObjectsMethod) {
-					checkObjectsEqualsMethod(expression);
-				} else {
-					checkEqualsMethod(expression);
+				if ("equals".equals(methodName)) {
+					if (isObjectsMethod) {
+						checkObjectsEqualsMethod(expression);
+					} else {
+						checkEqualsMethod(expression);
+					}
 				}
 			}
 		}
