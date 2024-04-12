@@ -4,13 +4,14 @@ import com.intellij.psi.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
+import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.ImplementationSmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
 
 import java.util.List;
 
-public class ObjectComparisonVisitor extends JavaElementVisitor {
+public class ObjectComparisonVisitor extends CodeInspectionVisitor {
 
 	private static final String DESCRIPTION = InspectionsBundle.message("inspection.comparing.objects.references.problem.descriptor");
 	private static final String NAME = InspectionsBundle.message("inspection.comparing.objects.references.display.name");
@@ -22,19 +23,26 @@ public class ObjectComparisonVisitor extends JavaElementVisitor {
 	}
 
 	@Override
+	public boolean isInspectionEnabled() {
+		return settings.isObjectComparisonCheck();
+	}
+
+	@Override
 	public void visitBinaryExpression(PsiBinaryExpression expression) {
-		super.visitBinaryExpression(expression);
-		IElementType opSign = expression.getOperationTokenType();
-		if (opSign == JavaTokenType.EQEQ || opSign == JavaTokenType.NE) {
-			PsiExpression lOperand = expression.getLOperand();
-			PsiExpression rOperand = expression.getROperand();
-			if (rOperand == null || isNullLiteral(lOperand) || isNullLiteral(rOperand)) return;
+		if (isInspectionEnabled()) {
+			super.visitBinaryExpression(expression);
+			IElementType opSign = expression.getOperationTokenType();
+			if (opSign == JavaTokenType.EQEQ || opSign == JavaTokenType.NE) {
+				PsiExpression lOperand = expression.getLOperand();
+				PsiExpression rOperand = expression.getROperand();
+				if (rOperand == null || isNullLiteral(lOperand) || isNullLiteral(rOperand)) return;
 
-			PsiType lType = lOperand.getType();
-			PsiType rType = rOperand.getType();
+				PsiType lType = lOperand.getType();
+				PsiType rType = rOperand.getType();
 
-			if ((isObject(lType) && isNotEnum(lType))|| (isObject(rType)&& isNotEnum(rType))) {
-				registerSmell(expression);
+				if ((isObject(lType) && isNotEnum(lType)) || (isObject(rType) && isNotEnum(rType))) {
+					registerSmell(expression);
+				}
 			}
 		}
 	}
