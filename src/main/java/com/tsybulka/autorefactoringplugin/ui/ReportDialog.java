@@ -55,7 +55,6 @@ public class ReportDialog extends JDialog {
 	private final Color editorBackgroundColor;
 
 	public ReportDialog(ProjectSmellsInfo smellsInfo) {
-		//this.project = project;
 		this.smellsInfo = smellsInfo;
 
 		setModal(true);

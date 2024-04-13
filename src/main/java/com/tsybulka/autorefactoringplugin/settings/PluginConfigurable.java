@@ -9,6 +9,7 @@ import java.util.Objects;
 
 public class PluginConfigurable implements Configurable {
 	private PluginSettingsComponent pluginSettingsComponent;
+	private final PluginSettings settings = PluginSettings.getInstance();
 
 	@Nls(capitalization = Nls.Capitalization.Title)
 	@Override
@@ -25,7 +26,6 @@ public class PluginConfigurable implements Configurable {
 
 	@Override
 	public boolean isModified() {
-		PluginSettings settings = PluginSettings.getInstance();
 		return pluginSettingsComponent.getEnumComparisonCheckBox().isSelected() != settings.isEnumComparisonCheck() ||
 				pluginSettingsComponent.getObjectComparisonCheckBox().isSelected() != settings.isObjectComparisonCheck() ||
 				!Objects.equals(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()), settings.getCyclomaticComplexity());
@@ -33,7 +33,6 @@ public class PluginConfigurable implements Configurable {
 
 	@Override
 	public void apply() {
-		PluginSettings settings = PluginSettings.getInstance();
 		if (areSettingsValid(pluginSettingsComponent)) {
 			settings.setEnumComparisonCheck(pluginSettingsComponent.getEnumComparisonCheckBox().isSelected());
 			settings.setObjectComparisonCheck(pluginSettingsComponent.getObjectComparisonCheckBox().isSelected());
@@ -45,7 +44,6 @@ public class PluginConfigurable implements Configurable {
 
 	@Override
 	public void reset() {
-		PluginSettings settings = PluginSettings.getInstance();
 		pluginSettingsComponent.getEnumComparisonCheckBox().setSelected(settings.isEnumComparisonCheck());
 		pluginSettingsComponent.getObjectComparisonCheckBox().setSelected(settings.isObjectComparisonCheck());
 		pluginSettingsComponent.getCyclomaticComplexityNumericalField().setText(String.valueOf(settings.getCyclomaticComplexity()));

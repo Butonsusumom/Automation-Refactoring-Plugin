@@ -38,10 +38,10 @@ public class MetricPieChartService {
 				new JBColor(new Color(150, 155, 230), new Color(83, 89, 161)),
 				new JBColor(new Color(165, 170, 240), new Color(107, 113, 175)),
 				new JBColor(new Color(180, 185, 250), new Color(132, 137, 188)),
-				new JBColor(new Color(195, 200, 255), new Color(132, 137, 188)),
-				new JBColor(new Color(210, 215, 255), new Color(157, 160, 201)),
-				new JBColor(new Color(225, 230, 255), new Color(181, 184, 215)),
-				new JBColor(new Color(240, 245, 255), new Color(206, 208, 228))
+				new JBColor(new Color(195, 200, 255), new Color(157, 160, 201)),
+				new JBColor(new Color(210, 215, 255), new Color(181, 184, 215)),
+				new JBColor(new Color(225, 230, 255), new Color(206, 208, 228)),
+				new JBColor(new Color(240, 245, 255), new Color(220, 232, 240))
 		};
 
 		PieStyler styler = chart.getStyler();
