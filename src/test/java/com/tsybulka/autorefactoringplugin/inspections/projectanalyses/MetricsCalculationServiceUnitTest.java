@@ -43,14 +43,17 @@ public class MetricsCalculationServiceUnitTest {
 	}
 
 	@Test
-	public void testGetFilePath_Success() {
+	public void shouldReturnFilePath_whenGetFilePath_getValidPsiFile() {
+		// given
 		String expectedFilePath = "/path/to/file";
 		when(psiClass.getContainingFile()).thenReturn(psiFile);
 		when(psiFile.getVirtualFile()).thenReturn(virtualFile);
 		when(virtualFile.getPath()).thenReturn(expectedFilePath);
 
-		String filePath = classUnderTest.getFilePath(psiClass);
+		// when
+		String actualFilePath = classUnderTest.getFilePath(psiClass);
 
-		assertEquals(expectedFilePath, filePath);
+		// then
+		assertEquals(expectedFilePath, actualFilePath);
 	}
 }
