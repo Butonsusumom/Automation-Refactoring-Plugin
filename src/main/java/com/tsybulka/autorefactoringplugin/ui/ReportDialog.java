@@ -189,8 +189,8 @@ public class ReportDialog extends JDialog {
 
 		leftPanel.setBackground(editorBackgroundColor);
 		leftPanel.add(projectLevelSmellsBtn);
-		leftPanel.add(implementationSmellsBtn);
 		leftPanel.add(architectureSmellsBtn);
+		leftPanel.add(implementationSmellsBtn);
 		leftPanel.add(testSmellsBtn);
 	}
 
@@ -271,7 +271,11 @@ public class ReportDialog extends JDialog {
 	}
 
 	public void showSmellsWithFrequency(HashMap<String, Integer> frequencyMap) {
-		JTable table = new JBTable();
+		JTable table = new JTable() {
+			public boolean editCellAt(int row, int column, java.util.EventObject e) {
+				return false;
+			}
+		};
 		table.setBackground(UIUtil.getPanelBackground());
 		table.setCellSelectionEnabled(false);
 		table.setColumnSelectionAllowed(false);
@@ -304,6 +308,7 @@ public class ReportDialog extends JDialog {
 		JScrollPane scrollPane = new JBScrollPane(table);
 		scrollPane.setBackground(UIUtil.getPanelBackground());
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		bottomRightPanel.setBackground(UIUtil.getPanelBackground());
 		bottomRightPanel.setLayout(new BorderLayout());
 		bottomRightPanel.add(scrollPane, BorderLayout.CENTER);
