@@ -20,6 +20,9 @@ public class EnumComparisonInspection extends AbstractBaseJavaLocalInspectionToo
 
 	private final LocalQuickFix quickFix = new EnumComparisonFix();
 
+	@Override
+
+
 	@NotNull
 	public String getDisplayName() {
 		return NAME;
