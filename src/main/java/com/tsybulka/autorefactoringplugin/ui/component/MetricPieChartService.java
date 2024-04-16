@@ -5,7 +5,9 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import org.knowm.xchart.*;
+import org.knowm.xchart.PieChart;
+import org.knowm.xchart.PieChartBuilder;
+import org.knowm.xchart.PieSeries;
 import org.knowm.xchart.style.PieStyler;
 
 import java.awt.*;

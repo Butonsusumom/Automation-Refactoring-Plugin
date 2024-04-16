@@ -1,7 +1,8 @@
-package com.tsybulka.autorefactoringplugin.model.smell.codesmell;
+package com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation;
 
 import com.intellij.psi.PsiElement;
 import com.tsybulka.autorefactoringplugin.model.smell.SpecificSmellType;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.CodeSmell;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

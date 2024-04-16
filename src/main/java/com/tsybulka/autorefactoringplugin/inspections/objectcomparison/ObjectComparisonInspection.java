@@ -1,13 +1,15 @@
 package com.tsybulka.autorefactoringplugin.inspections.objectcomparison;
 
+import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaElementVisitor;
+import com.intellij.psi.PsiBinaryExpression;
+import com.intellij.psi.PsiElementVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 
 import java.util.ArrayList;
 import java.util.List;

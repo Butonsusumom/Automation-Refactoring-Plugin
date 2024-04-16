@@ -28,6 +28,7 @@ public class PluginConfigurable implements Configurable {
 	public boolean isModified() {
 		return pluginSettingsComponent.getEnumComparisonCheckBox().isSelected() != settings.isEnumComparisonCheck() ||
 				pluginSettingsComponent.getObjectComparisonCheckBox().isSelected() != settings.isObjectComparisonCheck() ||
+				pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected() != settings.isObjectMethodParameterCheck() ||
 				!Objects.equals(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()), settings.getCyclomaticComplexity());
 	}
 
@@ -36,6 +37,7 @@ public class PluginConfigurable implements Configurable {
 		if (areSettingsValid(pluginSettingsComponent)) {
 			settings.setEnumComparisonCheck(pluginSettingsComponent.getEnumComparisonCheckBox().isSelected());
 			settings.setObjectComparisonCheck(pluginSettingsComponent.getObjectComparisonCheckBox().isSelected());
+			settings.setObjectMethodParameterCheck(pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected());
 			settings.setCyclomaticComplexity(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()));
 		} else {
 			pluginSettingsComponent.getErrorCyclomaticComplexityLabel().setVisible(true);
@@ -46,6 +48,7 @@ public class PluginConfigurable implements Configurable {
 	public void reset() {
 		pluginSettingsComponent.getEnumComparisonCheckBox().setSelected(settings.isEnumComparisonCheck());
 		pluginSettingsComponent.getObjectComparisonCheckBox().setSelected(settings.isObjectComparisonCheck());
+		pluginSettingsComponent.getObjectMethodParameterCheckBox().setSelected(settings.isObjectMethodParameterCheck());
 		pluginSettingsComponent.getCyclomaticComplexityNumericalField().setText(String.valueOf(settings.getCyclomaticComplexity()));
 	}
 

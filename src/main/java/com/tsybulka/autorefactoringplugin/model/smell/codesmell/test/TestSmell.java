@@ -1,5 +1,6 @@
-package com.tsybulka.autorefactoringplugin.model.smell.codesmell;
+package com.tsybulka.autorefactoringplugin.model.smell.codesmell.test;
 
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.CodeSmell;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
