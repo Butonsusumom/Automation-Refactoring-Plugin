@@ -11,6 +11,7 @@ import com.tsybulka.autorefactoringplugin.inspections.testmethodnaming.TestMetho
  */
 public class CodeInspectionProvider implements InspectionToolProvider {
 
+	@NotNull
 	@Override
 	public Class[] getInspectionClasses() {
 		return new Class[] {

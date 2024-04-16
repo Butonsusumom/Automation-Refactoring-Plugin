@@ -8,6 +8,7 @@ import com.intellij.psi.PsiMethod;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ObjectMethodParameterSmell;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -46,7 +47,8 @@ public class ObjectMethodParameterInspection extends AbstractBaseJavaLocalInspec
 				ObjectMethodParameterVisitor visitor = new ObjectMethodParameterVisitor(smellsList);
 				method.accept(visitor);
 				for (ImplementationSmell implementationSmell : smellsList) {
-					holder.registerProblem(implementationSmell.getPsiElement(), implementationSmell.getDescription(), quickFix);
+					ObjectMethodParameterSmell smell = (ObjectMethodParameterSmell) implementationSmell;
+					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), quickFix);
 				}
 			}
 		};
