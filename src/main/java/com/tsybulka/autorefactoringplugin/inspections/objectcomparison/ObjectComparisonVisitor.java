@@ -7,7 +7,7 @@ import com.intellij.psi.util.PsiUtil;
 import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.ImplementationSmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package com.tsybulka.autorefactoringplugin.model.smell;
 
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ArchitectureSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ClassMetrics;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.TestSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.architecture.ArchitectureSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.ClassMetrics;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

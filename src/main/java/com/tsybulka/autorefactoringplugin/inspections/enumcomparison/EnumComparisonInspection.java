@@ -3,10 +3,12 @@ package com.tsybulka.autorefactoringplugin.inspections.enumcomparison;
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaElementVisitor;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

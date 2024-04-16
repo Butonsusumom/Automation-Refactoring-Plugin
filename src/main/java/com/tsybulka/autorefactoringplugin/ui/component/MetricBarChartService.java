@@ -6,7 +6,7 @@ import com.intellij.util.ui.UIUtil;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ClassMetrics;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.ClassMetrics;
 import com.tsybulka.autorefactoringplugin.ui.UiBundle;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
