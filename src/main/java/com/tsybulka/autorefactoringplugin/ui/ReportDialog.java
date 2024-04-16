@@ -1,28 +1,28 @@
 package com.tsybulka.autorefactoringplugin.ui;
 
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ArchitectureSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ClassMetrics;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.TestSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.architecture.ArchitectureSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.ClassMetrics;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
 import com.tsybulka.autorefactoringplugin.ui.component.MetricBarChartService;
 import com.tsybulka.autorefactoringplugin.ui.component.MetricPieChartService;
 import com.tsybulka.autorefactoringplugin.ui.component.SmellTableService;
 import com.tsybulka.autorefactoringplugin.ui.component.TextAreaRenderer;
-import org.knowm.xchart.*;
+import org.knowm.xchart.CategoryChart;
+import org.knowm.xchart.PieChart;
+import org.knowm.xchart.XChartPanel;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ReportDialog extends JDialog {
 

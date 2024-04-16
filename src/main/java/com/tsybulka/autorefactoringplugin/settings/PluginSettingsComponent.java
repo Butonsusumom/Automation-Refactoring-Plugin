@@ -24,6 +24,8 @@ public class PluginSettingsComponent {
 	@NotNull
 	private JCheckBox objectComparisonCheckBox = new JBCheckBox("Objects content comparison check");
 	@NotNull
+	private JCheckBox objectMethodParameterCheckBox = new JBCheckBox("Object method parameter check");
+	@NotNull
 	private JTextField cyclomaticComplexityNumericalField = new JBTextField();
 	@NotNull
 	private JLabel errorCyclomaticComplexityLabel = new JBLabel("<html>Methods with cyclomatic complexity over 20 are viewed as complex, potentially impacting maintainability.<br/> Please reduce maximum allowed cyclomatic complexity.</html>");
@@ -56,6 +58,7 @@ public class PluginSettingsComponent {
 				.addComponent(new TitledSeparator("Enable/Disable Code Inspections"), 1)
 				.addComponent(enumComparisonCheckBox, 1)
 				.addComponent(objectComparisonCheckBox, 1)
+				.addComponent(objectMethodParameterCheckBox,1)
 				.addComponentFillVertically(new JPanel(), 0)
 				.getPanel();
 	}

@@ -2,10 +2,10 @@ package com.tsybulka.autorefactoringplugin.ui.component;
 
 import com.intellij.ui.components.JBScrollPane;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ArchitectureSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ClassMetrics;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ImplementationSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.TestSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.architecture.ArchitectureSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.ClassMetrics;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
 import com.tsybulka.autorefactoringplugin.ui.UiBundle;
 
 import javax.swing.*;

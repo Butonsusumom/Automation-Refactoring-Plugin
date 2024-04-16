@@ -1,4 +1,4 @@
-package com.tsybulka.autorefactoringplugin.model.smell.codesmell;
+package com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric;
 
 import com.intellij.psi.PsiElement;
 import com.tsybulka.autorefactoringplugin.model.smell.SpecificSmellType;

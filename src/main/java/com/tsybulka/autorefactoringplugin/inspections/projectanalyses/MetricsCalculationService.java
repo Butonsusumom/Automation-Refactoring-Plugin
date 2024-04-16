@@ -1,26 +1,21 @@
 package com.tsybulka.autorefactoringplugin.inspections.projectanalyses;
 
-import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.ClassMetrics;
-
-import java.util.HashMap;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.ClassMetrics;
 
 import java.util.*;
 
-import static com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType.*;
+import static com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType.LACK_OF_COHESION_IN_METHOD;
 
 /**
  * Service perform calculation of OOP metrics
@@ -29,7 +24,7 @@ public class MetricsCalculationService {
 
 	public List<ClassMetrics> calculateProjectMetrics(Project project) {
 		List<ClassMetrics> classMetrics = new ArrayList<>();
-		List<PsiClass> classes = getProjectClasses(project);
+		List<PsiClass> classes = collectPsiClassesFromSrc(project);
 		for (PsiClass psiClass : classes) {
 					classMetrics.add(
 					new ClassMetrics(getPackageName(psiClass), getClassName(psiClass), getFilePath(psiClass), calculateOopMetrics(psiClass, project)));
@@ -127,6 +122,7 @@ public class MetricsCalculationService {
 				super.visitReferenceExpression(expression);
 				if (expression.resolve() instanceof PsiField) {
 					PsiField field = (PsiField) expression.resolve();
+					assert field != null;
 					fieldNames.add(field.getName());
 				}
 			}
@@ -187,29 +183,39 @@ public class MetricsCalculationService {
 		return depth - 1; // Subtract 1 to exclude the class itself
 	}
 
-	List<PsiClass> getProjectClasses(Project project) {
-		List<PsiClass> userClasses = new ArrayList<>();
-		PsiManager psiManager = PsiManager.getInstance(project);
-		ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+	public List<PsiClass> collectPsiClassesFromSrc(Project project) {
+		List<PsiClass> psiClasses = new ArrayList<>();
 
-		Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.allScope(project));
+		// Get the source root directories of the project
+		VirtualFile[] sourceRoots = ProjectRootManager.getInstance(project).getContentSourceRoots();
 
-		for (VirtualFile virtualFile : virtualFiles) {
-			// Check if the file is under source content and not in libraries
-			if (fileIndex.isInSourceContent(virtualFile) && !fileIndex.isInLibrary(virtualFile)) {
-				PsiFile psiFile = psiManager.findFile(virtualFile);
-				if (psiFile != null) {
-					// Collect only class definitions
-					for (PsiClass psiClass : PsiTreeUtil.findChildrenOfType(psiFile, PsiClass.class)) {
-						// Ensure the PsiClass is directly defined in the file, not referenced
-						if (psiClass.getParent() instanceof PsiFile) {
-							userClasses.add(psiClass);
-						}
-					}
-				}
+		// Iterate through each source root directory
+		for (VirtualFile sourceRoot : sourceRoots) {
+			PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(sourceRoot);
+			if (psiDirectory != null) {
+				// Recursively collect PsiClasses from the source root directory
+				collectPsiClassesRecursively(psiDirectory, psiClasses);
 			}
 		}
-		return userClasses;
+
+		return psiClasses;
+	}
+
+	private static void collectPsiClassesRecursively(PsiDirectory directory, List<PsiClass> psiClasses) {
+		// Get all files in the directory
+		for (PsiFile psiFile : directory.getFiles()) {
+			// Check if the file is a Java file
+			if (psiFile instanceof PsiJavaFile) {
+				PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+				// Get all classes from the Java file
+				Collections.addAll(psiClasses, psiJavaFile.getClasses());
+			}
+		}
+
+		// Recursively iterate through subdirectories
+		for (PsiDirectory subdirectory : directory.getSubdirectories()) {
+			collectPsiClassesRecursively(subdirectory, psiClasses);
+		}
 	}
 
 	public static String getPackageName(PsiClass psiClass) {
