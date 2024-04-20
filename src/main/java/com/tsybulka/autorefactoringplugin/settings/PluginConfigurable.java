@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class PluginConfigurable implements Configurable {
 	private PluginSettingsComponent pluginSettingsComponent;
@@ -29,18 +31,24 @@ public class PluginConfigurable implements Configurable {
 		return pluginSettingsComponent.getEnumComparisonCheckBox().isSelected() != settings.isEnumComparisonCheck() ||
 				pluginSettingsComponent.getObjectComparisonCheckBox().isSelected() != settings.isObjectComparisonCheck() ||
 				pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected() != settings.isObjectMethodParameterCheck() ||
-				!Objects.equals(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()), settings.getCyclomaticComplexity());
+				!Objects.equals(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()), settings.getCyclomaticComplexity()) ||
+				!Objects.equals(pluginSettingsComponent.getTestMethodNamingRegexField().getText(), settings.getTestMethodNamingRegExp());
 	}
 
 	@Override
 	public void apply() {
-		if (areSettingsValid(pluginSettingsComponent)) {
-			settings.setEnumComparisonCheck(pluginSettingsComponent.getEnumComparisonCheckBox().isSelected());
-			settings.setObjectComparisonCheck(pluginSettingsComponent.getObjectComparisonCheckBox().isSelected());
-			settings.setObjectMethodParameterCheck(pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected());
+		settings.setEnumComparisonCheck(pluginSettingsComponent.getEnumComparisonCheckBox().isSelected());
+		settings.setObjectComparisonCheck(pluginSettingsComponent.getObjectComparisonCheckBox().isSelected());
+		settings.setObjectMethodParameterCheck(pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected());
+		if (isCyclomaticComplexityValid(pluginSettingsComponent)) {
 			settings.setCyclomaticComplexity(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()));
 		} else {
 			pluginSettingsComponent.getErrorCyclomaticComplexityLabel().setVisible(true);
+		}
+		if (isRegExpValid(pluginSettingsComponent)) {
+			settings.setTestMethodNamingRegExp(pluginSettingsComponent.getTestMethodNamingRegexField().getText());
+		} else {
+			pluginSettingsComponent.getErrorTestMethodNamingLabel().setVisible(true);
 		}
 	}
 
@@ -50,6 +58,7 @@ public class PluginConfigurable implements Configurable {
 		pluginSettingsComponent.getObjectComparisonCheckBox().setSelected(settings.isObjectComparisonCheck());
 		pluginSettingsComponent.getObjectMethodParameterCheckBox().setSelected(settings.isObjectMethodParameterCheck());
 		pluginSettingsComponent.getCyclomaticComplexityNumericalField().setText(String.valueOf(settings.getCyclomaticComplexity()));
+		pluginSettingsComponent.getTestMethodNamingRegexField().setText(settings.getTestMethodNamingRegExp());
 	}
 
 	@Override
@@ -57,8 +66,17 @@ public class PluginConfigurable implements Configurable {
 		pluginSettingsComponent = null;
 	}
 
-	private boolean areSettingsValid(PluginSettingsComponent settings) {
+	private boolean isCyclomaticComplexityValid(PluginSettingsComponent settings) {
 		return Integer.parseInt(settings.getCyclomaticComplexityNumericalField().getText()) <= 20;
+	}
+
+	private boolean isRegExpValid(PluginSettingsComponent settings) {
+		try {
+			Pattern.compile(settings.getTestMethodNamingRegexField().getText());
+			return true;  // No exception thrown, so the regex is valid
+		} catch (PatternSyntaxException e) {
+			return false;  // Exception thrown, regex is invalid
+		}
 	}
 
 }

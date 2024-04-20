@@ -6,11 +6,7 @@ import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
-import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterFix;
-import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterVisitor;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ObjectMethodParameterSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,10 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Checks if test have proper naming: should_when*testedMethod*_given
+ * Checks if test have proper naming
  */
 public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionTool {
-	//private final ObjectMethodParameterFix quickFix = new ObjectMethodParameterFix();
+
+	private final TestMethodNamingFix quickFix = new TestMethodNamingFix();
+
 	private static final String NAME = InspectionsBundle.message("inspection.test.method.name.display.name");
 
 	@NotNull
@@ -46,11 +44,10 @@ public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionT
 			@Override
 			public void visitMethod(PsiMethod method) {
 				List<TestSmell> smellsList = new ArrayList<>();
-				new ObjectMethodParameterVisitor(smellsList);
+				TestMethodNamingVisitor visitor = new TestMethodNamingVisitor(smellsList);
 				method.accept(visitor);
-				for (ImplementationSmell implementationSmell : smellsList) {
-					ObjectMethodParameterSmell smell = (ObjectMethodParameterSmell) implementationSmell;
-					holder.registerProblem(smell.getPsiElement(), smell.getDescription());
+				for (TestSmell testSmell : smellsList) {
+					holder.registerProblem(testSmell.getPsiElement(), testSmell.getDescription(), quickFix);
 				}
 			}
 		};
