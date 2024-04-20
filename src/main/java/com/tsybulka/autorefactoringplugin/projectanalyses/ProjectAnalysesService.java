@@ -1,4 +1,4 @@
-package com.tsybulka.autorefactoringplugin.inspections.projectanalyses;
+package com.tsybulka.autorefactoringplugin.projectanalyses;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
@@ -7,6 +7,7 @@ import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.objectcomparison.ObjectComparisonVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterVisitor;
+import com.tsybulka.autorefactoringplugin.inspections.testmethodnaming.TestMethodNamingVisitor;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.architecture.ArchitectureSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ProjectAnalysesService {
 
@@ -24,16 +26,16 @@ public class ProjectAnalysesService {
 	public ProjectSmellsInfo analyseProject(Project project) {
 		List<ClassMetrics> projectClassMetrics = metricsCalculationService.calculateProjectMetrics(project);
 
-		List<PsiClass> classes = metricsCalculationService.collectPsiClassesFromSrc(project);
+		Set<PsiClass> classes = metricsCalculationService.collectPsiClassesFromSrc(project);
 
 		List<ImplementationSmell> implementationSmellsList = new ArrayList<>(collectImplementationSmells(classes));
 		List<ArchitectureSmell> architectureSmellList = new ArrayList<>(collectArchitectureSmells(project));
-		List<TestSmell> testSmellsList = new ArrayList<>(collectTestSmells(project));
+		List<TestSmell> testSmellsList = new ArrayList<>(collectTestSmells(classes));
 
 		return new ProjectSmellsInfo(implementationSmellsList, architectureSmellList, testSmellsList, projectClassMetrics);
 	}
 
-	List<ImplementationSmell> collectImplementationSmells(List<PsiClass> classes) {
+	List<ImplementationSmell> collectImplementationSmells(Set<PsiClass> classes) {
 		List<ImplementationSmell> implementationSmellsList = new ArrayList<>();
 
 		EnumComparisonVisitor enumComparisonVisitor = new EnumComparisonVisitor(implementationSmellsList);
@@ -60,8 +62,23 @@ public class ProjectAnalysesService {
 		return new ArrayList<>();
 	}
 
-	List<TestSmell> collectTestSmells(Project project) {
-		return new ArrayList<>();
+	List<TestSmell> collectTestSmells(Set<PsiClass> classes) {
+		List<TestSmell> testSmellsList = new ArrayList<>();
+
+		TestMethodNamingVisitor testMethodNamingVisitor = new TestMethodNamingVisitor(testSmellsList);
+
+		for (PsiClass psiClass : classes) {
+			psiClass.accept(new PsiRecursiveElementVisitor() {
+				@Override
+				public void visitElement(@NotNull PsiElement element) {
+					super.visitElement(element);
+					element.accept(testMethodNamingVisitor);
+				}
+			});
+
+		}
+
+		return testSmellsList;
 	}
 
 }

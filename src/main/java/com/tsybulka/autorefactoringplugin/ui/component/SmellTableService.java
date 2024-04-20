@@ -30,6 +30,12 @@ public class SmellTableService {
 		model.addColumn(PACKAGE_COLUMN);
 		model.addColumn(DESCRIPTION_COLUMN);
 
+		table.getColumn(SMELL_TYPE_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(DESCRIPTION_COLUMN).setCellRenderer(new TextAreaRenderer());
+
+		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(170);
+		table.getColumn(DESCRIPTION_COLUMN).setPreferredWidth(300);
+
 		for (ArchitectureSmell smell : architectureSmellList) {
 			Object[] row = new Object[3];
 
@@ -53,8 +59,8 @@ public class SmellTableService {
 		model.addColumn(METHOD_COLUMN);
 		model.addColumn(DESCRIPTION_COLUMN);
 
-		table.getColumn(DESCRIPTION_COLUMN).setCellRenderer(new TextAreaRenderer());
 		table.getColumn(SMELL_TYPE_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(DESCRIPTION_COLUMN).setCellRenderer(new TextAreaRenderer());
 
 		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(170);
 		table.getColumn(DESCRIPTION_COLUMN).setPreferredWidth(300);
@@ -121,6 +127,12 @@ public class SmellTableService {
 		model.addColumn(CLASS_NAME_COLUMN);
 		model.addColumn(METHOD_COLUMN);
 		model.addColumn(DESCRIPTION_COLUMN);
+
+		table.getColumn(SMELL_TYPE_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(DESCRIPTION_COLUMN).setCellRenderer(new TextAreaRenderer());
+
+		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(170);
+		table.getColumn(DESCRIPTION_COLUMN).setPreferredWidth(300);
 
 		for (TestSmell smell : testSmellList) {
 			Object[] row = new Object[5];

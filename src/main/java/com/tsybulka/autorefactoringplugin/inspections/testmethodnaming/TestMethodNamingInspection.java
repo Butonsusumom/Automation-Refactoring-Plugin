@@ -1,4 +1,4 @@
-package com.tsybulka.autorefactoringplugin.inspections.objectparameter;
+package com.tsybulka.autorefactoringplugin.inspections.testmethodnaming;
 
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -7,19 +7,18 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finds Object parameter where only 1 filed used in method
+ * Checks if test have proper naming: should_when*testedMethod*_given
  */
-public class ObjectMethodParameterInspection extends AbstractBaseJavaLocalInspectionTool {
-
-	private final ObjectMethodParameterFix quickFix = new ObjectMethodParameterFix();
-	private static final String NAME = InspectionsBundle.message("inspection.object.parameter.display.name");
+public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionTool {
+	//private final ObjectMethodParameterFix quickFix = new ObjectMethodParameterFix();
+	private static final String NAME = InspectionsBundle.message("inspection.test.method.name.display.name");
 
 	@NotNull
 	public String getDisplayName() {
@@ -28,7 +27,7 @@ public class ObjectMethodParameterInspection extends AbstractBaseJavaLocalInspec
 
 	@NotNull
 	public String getGroupDisplayName() {
-		return SmellType.IMPLEMENTATION.toString();
+		return SmellType.TEST.toString();
 	}
 
 	@Override
@@ -42,11 +41,11 @@ public class ObjectMethodParameterInspection extends AbstractBaseJavaLocalInspec
 		return new JavaElementVisitor() {
 			@Override
 			public void visitMethod(PsiMethod method) {
-				List<ImplementationSmell> smellsList = new ArrayList<>();
-				ObjectMethodParameterVisitor visitor = new ObjectMethodParameterVisitor(smellsList);
+				List<TestSmell> smellsList = new ArrayList<>();
+				TestMethodNamingVisitor visitor = new TestMethodNamingVisitor(smellsList);
 				method.accept(visitor);
-				for (ImplementationSmell smell : smellsList) {
-					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), quickFix);
+				for (TestSmell smell : smellsList) {
+					holder.registerProblem(smell.getPsiElement(), smell.getDescription());
 				}
 			}
 		};
