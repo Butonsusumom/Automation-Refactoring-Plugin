@@ -5,8 +5,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +38,7 @@ public class ObjectMethodParameterVisitor extends CodeInspectionVisitor {
 				if (!(parameter.getType() instanceof PsiPrimitiveType)) {
 					// Analyze method body to determine accessed properties from parameters
 					Set<PsiField> accessedProperties = new HashSet<>();
+					Set<String> methodCalls = new HashSet<>();
 					method.accept(new JavaRecursiveElementVisitor() {
 						@Override
 						public void visitReferenceExpression(PsiReferenceExpression expression) {
@@ -45,17 +46,22 @@ public class ObjectMethodParameterVisitor extends CodeInspectionVisitor {
 							PsiElement resolved = expression.resolve();
 							if (resolved instanceof PsiField && isParameterOfObject(parameter, resolved)) {
 								accessedProperties.add((PsiField) resolved);
-							} else if (resolved instanceof PsiMethod && isGetterMethod((PsiMethod) resolved)) {
-								PsiField objectField = resolveGetterField((PsiMethod) resolved);
-								if (isParameterOfObject(parameter, objectField)) {
-									accessedProperties.add(objectField);
+							} else if (resolved instanceof PsiMethod) {
+								PsiMethod resolvedMethod = (PsiMethod) resolved;
+								if (isGetterMethod(resolvedMethod)) {
+									PsiField objectField = resolveGetterField(resolvedMethod);
+									if (isParameterOfObject(parameter, objectField)) {
+										accessedProperties.add(objectField);
+									}
+								} else {
+									methodCalls.add(resolvedMethod.getName());
 								}
 							}
 						}
 					});
 
 					// Check if method can be refactored
-					if (accessedProperties.size() == 1) {
+					if (accessedProperties.size() == 1 && methodCalls.isEmpty()) {
 						PsiField property = accessedProperties.iterator().next();
 						registerSmell(method, property, parameter);
 					}
@@ -136,4 +142,3 @@ public class ObjectMethodParameterVisitor extends CodeInspectionVisitor {
 
 	}
 }
-
