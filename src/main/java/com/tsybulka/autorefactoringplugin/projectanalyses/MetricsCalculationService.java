@@ -1,4 +1,4 @@
-package com.tsybulka.autorefactoringplugin.projectanalyses;
+package com.tsybulka.autorefactoringplugin.inspections.projectanalyses;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -24,7 +24,7 @@ public class MetricsCalculationService {
 
 	public List<ClassMetrics> calculateProjectMetrics(Project project) {
 		List<ClassMetrics> classMetrics = new ArrayList<>();
-		Set<PsiClass> classes = collectPsiClassesFromSrc(project);
+		List<PsiClass> classes = collectPsiClassesFromSrc(project);
 		for (PsiClass psiClass : classes) {
 					classMetrics.add(
 					new ClassMetrics(getPackageName(psiClass), getClassName(psiClass), getFilePath(psiClass), calculateOopMetrics(psiClass, project)));
@@ -183,8 +183,8 @@ public class MetricsCalculationService {
 		return depth - 1; // Subtract 1 to exclude the class itself
 	}
 
-	public Set<PsiClass> collectPsiClassesFromSrc(Project project) {
-		Set<PsiClass> psiClasses = new HashSet<>();
+	public List<PsiClass> collectPsiClassesFromSrc(Project project) {
+		List<PsiClass> psiClasses = new ArrayList<>();
 
 		// Get the source root directories of the project
 		VirtualFile[] sourceRoots = ProjectRootManager.getInstance(project).getContentSourceRoots();
@@ -201,7 +201,7 @@ public class MetricsCalculationService {
 		return psiClasses;
 	}
 
-	private static void collectPsiClassesRecursively(PsiDirectory directory, Set<PsiClass> psiClasses) {
+	private static void collectPsiClassesRecursively(PsiDirectory directory, List<PsiClass> psiClasses) {
 		// Get all files in the directory
 		for (PsiFile psiFile : directory.getFiles()) {
 			// Check if the file is a Java file
