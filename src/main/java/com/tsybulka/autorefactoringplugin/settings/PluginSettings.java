@@ -18,7 +18,7 @@ final public class PluginSettings implements PersistentStateComponent<PluginSett
 	private boolean objectComparisonCheck = true;
 	private boolean enumComparisonCheck = true;
 	private boolean objectMethodParameterCheck = true;
-	private String testMethodNamingRegExp = "should[A-Z].*_when[A-Z].*_given[A-Z].*";
+	private String TestMethodNamingRegExp = "should[A-Z].*_when[A-Z].*_given[A-Z].*";
 	private int cyclomaticComplexity = 10;
 
 	@Override

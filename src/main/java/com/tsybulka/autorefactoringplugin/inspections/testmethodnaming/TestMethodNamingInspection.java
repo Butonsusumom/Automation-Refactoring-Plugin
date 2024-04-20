@@ -14,12 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Checks if test have proper naming
+ * Checks if test have proper naming: should_when*testedMethod*_given
  */
 public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionTool {
-
-	private final TestMethodNamingFix quickFix = new TestMethodNamingFix();
-
+	//private final ObjectMethodParameterFix quickFix = new ObjectMethodParameterFix();
 	private static final String NAME = InspectionsBundle.message("inspection.test.method.name.display.name");
 
 	@NotNull
@@ -46,8 +44,8 @@ public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionT
 				List<TestSmell> smellsList = new ArrayList<>();
 				TestMethodNamingVisitor visitor = new TestMethodNamingVisitor(smellsList);
 				method.accept(visitor);
-				for (TestSmell testSmell : smellsList) {
-					holder.registerProblem(testSmell.getPsiElement(), testSmell.getDescription(), quickFix);
+				for (TestSmell smell : smellsList) {
+					holder.registerProblem(smell.getPsiElement(), smell.getDescription());
 				}
 			}
 		};

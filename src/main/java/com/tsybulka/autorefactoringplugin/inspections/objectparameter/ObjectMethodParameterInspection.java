@@ -45,8 +45,8 @@ public class ObjectMethodParameterInspection extends AbstractBaseJavaLocalInspec
 				List<ImplementationSmell> smellsList = new ArrayList<>();
 				ObjectMethodParameterVisitor visitor = new ObjectMethodParameterVisitor(smellsList);
 				method.accept(visitor);
-				for (ImplementationSmell implementationSmell : smellsList) {
-					holder.registerProblem(implementationSmell.getPsiElement(), implementationSmell.getDescription(), quickFix);
+				for (ImplementationSmell smell : smellsList) {
+					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), quickFix);
 				}
 			}
 		};

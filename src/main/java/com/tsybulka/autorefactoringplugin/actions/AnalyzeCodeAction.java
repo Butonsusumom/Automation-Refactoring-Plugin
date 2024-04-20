@@ -2,8 +2,8 @@ package com.tsybulka.autorefactoringplugin.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.tsybulka.autorefactoringplugin.projectanalyses.ProjectAnalysesService;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
+import com.tsybulka.autorefactoringplugin.projectanalyses.ProjectAnalysesService;
 import com.tsybulka.autorefactoringplugin.ui.ReportDialog;
 
 import javax.swing.*;
