@@ -28,7 +28,8 @@ public class PluginConfigurable implements Configurable {
 
 	@Override
 	public boolean isModified() {
-		return pluginSettingsComponent.getEnumComparisonCheckBox().isSelected() != settings.isEnumComparisonCheck() ||
+		return pluginSettingsComponent.getScatteredFunctionalityCheckBox().isSelected() != settings.isScatteredFunctionalityCheck() ||
+				pluginSettingsComponent.getEnumComparisonCheckBox().isSelected() != settings.isEnumComparisonCheck() ||
 				pluginSettingsComponent.getObjectComparisonCheckBox().isSelected() != settings.isObjectComparisonCheck() ||
 				pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected() != settings.isObjectMethodParameterCheck() ||
 				!Objects.equals(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()), settings.getCyclomaticComplexity()) ||
@@ -37,6 +38,7 @@ public class PluginConfigurable implements Configurable {
 
 	@Override
 	public void apply() {
+		settings.setScatteredFunctionalityCheck(pluginSettingsComponent.getScatteredFunctionalityCheckBox().isSelected());
 		settings.setEnumComparisonCheck(pluginSettingsComponent.getEnumComparisonCheckBox().isSelected());
 		settings.setObjectComparisonCheck(pluginSettingsComponent.getObjectComparisonCheckBox().isSelected());
 		settings.setObjectMethodParameterCheck(pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected());
@@ -54,6 +56,7 @@ public class PluginConfigurable implements Configurable {
 
 	@Override
 	public void reset() {
+		pluginSettingsComponent.getScatteredFunctionalityCheckBox().setSelected(settings.isScatteredFunctionalityCheck());
 		pluginSettingsComponent.getEnumComparisonCheckBox().setSelected(settings.isEnumComparisonCheck());
 		pluginSettingsComponent.getObjectComparisonCheckBox().setSelected(settings.isObjectComparisonCheck());
 		pluginSettingsComponent.getObjectMethodParameterCheckBox().setSelected(settings.isObjectMethodParameterCheck());

@@ -21,6 +21,8 @@ public class PluginSettingsComponent {
 
 	private JPanel settingsPanel;
 	@NotNull
+	private JCheckBox scatteredFunctionalityCheckBox = new JBCheckBox("Scattered functionality check");
+	@NotNull
 	private JCheckBox enumComparisonCheckBox = new JBCheckBox("Enum reference comparison check");
 	@NotNull
 	private JCheckBox objectComparisonCheckBox = new JBCheckBox("Objects content comparison check");
@@ -66,6 +68,7 @@ public class PluginSettingsComponent {
 				.addComponent(exampleTestMethodNamingLabel, 1)
 				.addComponent(errorTestMethodNamingLabel, 1)
 				.addComponent(new TitledSeparator("Enable/Disable Code Inspections"), 1)
+				.addComponent(scatteredFunctionalityCheckBox, 1)
 				.addComponent(enumComparisonCheckBox, 1)
 				.addComponent(objectComparisonCheckBox, 1)
 				.addComponent(objectMethodParameterCheckBox,1)

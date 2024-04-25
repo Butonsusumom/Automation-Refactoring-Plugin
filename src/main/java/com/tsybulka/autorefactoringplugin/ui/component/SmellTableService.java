@@ -28,20 +28,27 @@ public class SmellTableService {
 		table.setModel(model);
 		model.addColumn(SMELL_TYPE_COLUMN);
 		model.addColumn(PACKAGE_COLUMN);
+		model.addColumn(CLASS_NAME_COLUMN);
+		model.addColumn(METHOD_COLUMN);
 		model.addColumn(DESCRIPTION_COLUMN);
 
 		table.getColumn(SMELL_TYPE_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(PACKAGE_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(CLASS_NAME_COLUMN).setCellRenderer(new TextAreaRenderer());
+		table.getColumn(METHOD_COLUMN).setCellRenderer(new TextAreaRenderer());
 		table.getColumn(DESCRIPTION_COLUMN).setCellRenderer(new TextAreaRenderer());
 
-		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(170);
-		table.getColumn(DESCRIPTION_COLUMN).setPreferredWidth(300);
+		table.getColumn(SMELL_TYPE_COLUMN).setPreferredWidth(150);
+		table.getColumn(DESCRIPTION_COLUMN).setPreferredWidth(250);
 
 		for (ArchitectureSmell smell : architectureSmellList) {
-			Object[] row = new Object[3];
+			Object[] row = new Object[5];
 
 			row[0] = smell.getName();
 			row[1] = smell.getClassPackage();
-			row[2] = smell.getDescription();
+			row[2] = smell.getClassName();
+			row[3] = smell.getMethodName();
+			row[4] = smell.getDescription();
 
 			model.addRow(row);
 		}

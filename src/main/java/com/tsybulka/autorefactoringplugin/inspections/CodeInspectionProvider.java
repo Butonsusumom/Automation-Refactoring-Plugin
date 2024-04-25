@@ -4,6 +4,7 @@ import com.intellij.codeInspection.InspectionToolProvider;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonInspection;
 import com.tsybulka.autorefactoringplugin.inspections.objectcomparison.ObjectComparisonInspection;
 import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterInspection;
+import com.tsybulka.autorefactoringplugin.inspections.scatteredfunctionality.ScatteredFunctionalityInspection;
 import com.tsybulka.autorefactoringplugin.inspections.testmethodnaming.TestMethodNamingInspection;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +18,7 @@ public class CodeInspectionProvider implements InspectionToolProvider {
 	public Class[] getInspectionClasses() {
 		return new Class[] {
 				// Architecture
+				ScatteredFunctionalityInspection.class,
 
 				// Implementation
 				ObjectComparisonInspection.class,
