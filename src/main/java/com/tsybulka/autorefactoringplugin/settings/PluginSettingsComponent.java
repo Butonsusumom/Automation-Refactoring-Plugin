@@ -29,6 +29,10 @@ public class PluginSettingsComponent {
 	@NotNull
 	private JCheckBox objectMethodParameterCheckBox = new JBCheckBox("Object method parameter check");
 	@NotNull
+	private JCheckBox lengthyMethodCheckBox = new JBCheckBox("Lengthy method check");
+	@NotNull
+	private JCheckBox recurringObjectCreationCheckBox = new JBCheckBox("Recurring object creation check");
+	@NotNull
 	private JTextField cyclomaticComplexityNumericalField = new JBTextField();
 	@NotNull
 	private JTextField testMethodNamingRegexField = new JBTextField();
@@ -72,6 +76,8 @@ public class PluginSettingsComponent {
 				.addComponent(enumComparisonCheckBox, 1)
 				.addComponent(objectComparisonCheckBox, 1)
 				.addComponent(objectMethodParameterCheckBox,1)
+				.addComponent(lengthyMethodCheckBox,1)
+				.addComponent(recurringObjectCreationCheckBox,1)
 				.addComponentFillVertically(new JPanel(), 0)
 				.getPanel();
 	}

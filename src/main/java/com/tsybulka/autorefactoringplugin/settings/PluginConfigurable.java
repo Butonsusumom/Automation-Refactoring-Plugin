@@ -32,6 +32,8 @@ public class PluginConfigurable implements Configurable {
 				pluginSettingsComponent.getEnumComparisonCheckBox().isSelected() != settings.isEnumComparisonCheck() ||
 				pluginSettingsComponent.getObjectComparisonCheckBox().isSelected() != settings.isObjectComparisonCheck() ||
 				pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected() != settings.isObjectMethodParameterCheck() ||
+				pluginSettingsComponent.getLengthyMethodCheckBox().isSelected() != settings.isLengthyMethodCheck() ||
+				pluginSettingsComponent.getRecurringObjectCreationCheckBox().isSelected() != settings.isRecurringObjectCreationCheck() ||
 				!Objects.equals(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()), settings.getCyclomaticComplexity()) ||
 				!Objects.equals(pluginSettingsComponent.getTestMethodNamingRegexField().getText(), settings.getTestMethodNamingRegExp());
 	}
@@ -42,6 +44,8 @@ public class PluginConfigurable implements Configurable {
 		settings.setEnumComparisonCheck(pluginSettingsComponent.getEnumComparisonCheckBox().isSelected());
 		settings.setObjectComparisonCheck(pluginSettingsComponent.getObjectComparisonCheckBox().isSelected());
 		settings.setObjectMethodParameterCheck(pluginSettingsComponent.getObjectMethodParameterCheckBox().isSelected());
+		settings.setLengthyMethodCheck(pluginSettingsComponent.getLengthyMethodCheckBox().isSelected());
+		settings.setRecurringObjectCreationCheck(pluginSettingsComponent.getRecurringObjectCreationCheckBox().isSelected());
 		if (isCyclomaticComplexityValid(pluginSettingsComponent)) {
 			settings.setCyclomaticComplexity(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()));
 		} else {
@@ -60,6 +64,8 @@ public class PluginConfigurable implements Configurable {
 		pluginSettingsComponent.getEnumComparisonCheckBox().setSelected(settings.isEnumComparisonCheck());
 		pluginSettingsComponent.getObjectComparisonCheckBox().setSelected(settings.isObjectComparisonCheck());
 		pluginSettingsComponent.getObjectMethodParameterCheckBox().setSelected(settings.isObjectMethodParameterCheck());
+		pluginSettingsComponent.getLengthyMethodCheckBox().setSelected(settings.isLengthyMethodCheck());
+		pluginSettingsComponent.getRecurringObjectCreationCheckBox().setSelected(settings.isRecurringObjectCreationCheck());
 		pluginSettingsComponent.getCyclomaticComplexityNumericalField().setText(String.valueOf(settings.getCyclomaticComplexity()));
 		pluginSettingsComponent.getTestMethodNamingRegexField().setText(settings.getTestMethodNamingRegExp());
 	}
