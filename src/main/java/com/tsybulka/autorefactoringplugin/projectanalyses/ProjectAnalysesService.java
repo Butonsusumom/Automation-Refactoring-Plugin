@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.MethodCyclomaticComplexityVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.objectcomparison.ObjectComparisonVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterVisitor;
@@ -44,6 +45,7 @@ public class ProjectAnalysesService {
 		EnumComparisonVisitor enumComparisonVisitor = new EnumComparisonVisitor(implementationSmellsList);
 		ObjectComparisonVisitor objectComparisonVisitor = new ObjectComparisonVisitor(implementationSmellsList);
 		ObjectMethodParameterVisitor objectMethodParameterVisitor = new ObjectMethodParameterVisitor(implementationSmellsList);
+		MethodCyclomaticComplexityVisitor cyclomaticComplexityVisitor = new MethodCyclomaticComplexityVisitor(implementationSmellsList);
 
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new PsiRecursiveElementVisitor() {
@@ -53,6 +55,7 @@ public class ProjectAnalysesService {
 					element.accept(enumComparisonVisitor);
 					element.accept(objectComparisonVisitor);
 					element.accept(objectMethodParameterVisitor);
+					element.accept(cyclomaticComplexityVisitor);
 				}
 			});
 

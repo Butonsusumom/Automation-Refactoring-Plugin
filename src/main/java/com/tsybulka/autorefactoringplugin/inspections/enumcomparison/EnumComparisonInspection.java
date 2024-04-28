@@ -39,7 +39,7 @@ public class EnumComparisonInspection extends AbstractBaseJavaLocalInspectionToo
 
 	@NotNull
 	@Override
-	public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
+	public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
 		return new JavaElementVisitor() {
 			@Override
 			public void visitMethodCallExpression(PsiMethodCallExpression expression) {

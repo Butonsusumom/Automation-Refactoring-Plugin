@@ -1,11 +1,10 @@
-package com.tsybulka.autorefactoringplugin.inspections.objectcomparison;
+package com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity;
 
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
-import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.JavaElementVisitor;
-import com.intellij.psi.PsiBinaryExpression;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiMethod;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
@@ -15,13 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finds a==b if a nd b Objects
+ * Finds methods which extends allowed cyclomatic complexity
  */
-public class ObjectComparisonInspection extends AbstractBaseJavaLocalInspectionTool  {
+public class MethodCyclomaticComplexityInspection extends AbstractBaseJavaLocalInspectionTool {
 
-	private static final String NAME = InspectionsBundle.message("inspection.comparing.objects.references.display.name");
-
-	private final LocalQuickFix quickFix = new ObjectComparisonFix();
+	private final MethodCyclomaticComplexityFix quickFix = new MethodCyclomaticComplexityFix();
+	private static final String NAME = InspectionsBundle.message("cyclomatic.complexity.display.name");
 
 	@NotNull
 	public String getDisplayName() {
@@ -43,10 +41,10 @@ public class ObjectComparisonInspection extends AbstractBaseJavaLocalInspectionT
 	public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
 		return new JavaElementVisitor() {
 			@Override
-			public void visitBinaryExpression(PsiBinaryExpression expression) {
+			public void visitMethod(PsiMethod method) {
 				List<ImplementationSmell> implementationSmellsList = new ArrayList<>();
-				ObjectComparisonVisitor visitor =  new ObjectComparisonVisitor(implementationSmellsList);
-				expression.accept(visitor);
+				MethodCyclomaticComplexityVisitor visitor =  new MethodCyclomaticComplexityVisitor(implementationSmellsList);
+				method.accept(visitor);
 				for (ImplementationSmell smell : implementationSmellsList) {
 					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), quickFix);
 				}
