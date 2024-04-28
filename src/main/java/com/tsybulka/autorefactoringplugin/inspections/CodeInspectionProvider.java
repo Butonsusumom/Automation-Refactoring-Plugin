@@ -1,6 +1,7 @@
 package com.tsybulka.autorefactoringplugin.inspections;
 
 import com.intellij.codeInspection.InspectionToolProvider;
+import com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.MethodCyclomaticComplexityInspection;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonInspection;
 import com.tsybulka.autorefactoringplugin.inspections.objectcomparison.ObjectComparisonInspection;
 import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterInspection;
@@ -24,6 +25,7 @@ public class CodeInspectionProvider implements InspectionToolProvider {
 				ObjectComparisonInspection.class,
 				EnumComparisonInspection.class,
 				ObjectMethodParameterInspection.class,
+				MethodCyclomaticComplexityInspection.class,
 
 				// Test
 				TestMethodNamingInspection.class
