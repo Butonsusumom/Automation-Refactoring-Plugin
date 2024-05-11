@@ -16,7 +16,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="c355f" class="javax.swing.JLabel" binding="originalComplexityLabel">
+          <component id="c355f" class="javax.swing.JLabel" binding="originalLoc">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -24,7 +24,7 @@
               <text value="Label"/>
             </properties>
           </component>
-          <component id="dbb82" class="javax.swing.JLabel" binding="newComplexityLabel">
+          <component id="dbb82" class="javax.swing.JLabel" binding="newNestingDepth">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class PsiElementExtractVisitor extends JavaRecursiveElementWalkingVisitor {
+public class PsiElementCyclomaticExtractVisitor extends JavaRecursiveElementWalkingVisitor {
 
 	private boolean refactored = false;
 

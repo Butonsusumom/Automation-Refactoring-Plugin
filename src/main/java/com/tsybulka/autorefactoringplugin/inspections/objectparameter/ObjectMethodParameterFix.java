@@ -40,7 +40,7 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 
 	private PsiField replaceFieldUsageWithParameter(PsiParameter parameter, PsiElementFactory factory) {
 		// Navigate up the PSI tree to find the containing method
-		final PsiField[] objectField = {null};
+		final PsiField[] objectField = new PsiField[1];
 		PsiMethod method = findContainingMethod(parameter);
 		method.accept(new JavaRecursiveElementVisitor() {
 			@Override

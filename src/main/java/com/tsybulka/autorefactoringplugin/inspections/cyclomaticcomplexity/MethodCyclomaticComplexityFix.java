@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class MethodCyclomaticComplexityFix implements LocalQuickFix {
 
-	private static final String FIX_MESSAGE = InspectionsBundle.message("cyclomatic.complexity.use.quickfix");
+	private static final String FIX_MESSAGE = InspectionsBundle.message("inspection.cyclomatic.complexity.use.quickfix");
 
 	@Nls
 	@NotNull
@@ -61,7 +61,7 @@ public class MethodCyclomaticComplexityFix implements LocalQuickFix {
 		if (maxComplexity >= totalComplexity) {
 			return refactor(complexElement);
 		} else {
-			PsiElementExtractVisitor extractVisitor = new PsiElementExtractVisitor();
+			PsiElementCyclomaticExtractVisitor extractVisitor = new PsiElementCyclomaticExtractVisitor();
 			complexElement.accept(extractVisitor);
 			return extractVisitor.isRefactored();
 		}

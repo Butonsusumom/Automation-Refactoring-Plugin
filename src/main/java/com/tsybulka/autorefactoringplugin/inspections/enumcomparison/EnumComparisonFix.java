@@ -30,10 +30,6 @@ public class EnumComparisonFix implements LocalQuickFix {
 		PsiMethod method = methodCallExpression.resolveMethod();
 		boolean isObjectsMethod = Objects.equals(method.getContainingClass().getQualifiedName(),"java.util.Objects");
 
-
-		PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-		PsiBinaryExpression equalsCall = (PsiBinaryExpression) factory.createExpressionFromText("a==b", null);
-
 		PsiExpression lOperand;
 		PsiExpression rOperand;
 
@@ -46,9 +42,27 @@ public class EnumComparisonFix implements LocalQuickFix {
 			lOperand=methodCallExpression.getArgumentList().getExpressions()[0];
 		}
 
+		PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
+		PsiBinaryExpression equalsCall = (PsiBinaryExpression) factory.createExpressionFromText("a==b", null);
+
+		PsiElement parent = methodCallExpression.getParent();
+
+		if (parent instanceof PsiPrefixExpression) {
+			PsiPrefixExpression prefixExpression = (PsiPrefixExpression) parent;
+			PsiJavaToken operationToken = prefixExpression.getOperationSign();
+
+			if (operationToken.getTokenType() == JavaTokenType.EXCL) {
+				equalsCall = (PsiBinaryExpression) factory.createExpressionFromText("a!=b", null);
+			}
+		}
+
 		Objects.requireNonNull(equalsCall.getROperand()).replace(rOperand);
 		Objects.requireNonNull(equalsCall.getLOperand()).replace(lOperand);
 
-		methodCallExpression.replace(equalsCall);
+		if (parent instanceof PsiPrefixExpression) {
+			parent.replace(equalsCall);
+		} else{
+			methodCallExpression.replace(equalsCall);
+		}
 	}
 }

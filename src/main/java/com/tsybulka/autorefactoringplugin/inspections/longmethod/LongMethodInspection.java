@@ -1,4 +1,4 @@
-package com.tsybulka.autorefactoringplugin.inspections.testmethodnaming;
+package com.tsybulka.autorefactoringplugin.inspections.longmethod;
 
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -7,18 +7,16 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
-import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
+import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Checks if test have proper naming: should_when*testedMethod*_given
- */
-public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionTool {
-	private final TestMethodNamingFix quickFix = new TestMethodNamingFix();
-	private static final String NAME = InspectionsBundle.message("inspection.test.method.name.display.name");
+public class LongMethodInspection extends AbstractBaseJavaLocalInspectionTool {
+
+	private final LongMethodFix quickFix = new LongMethodFix();
+	private static final String NAME = InspectionsBundle.message("inspection.long.method.display.name");
 
 	@NotNull
 	public String getDisplayName() {
@@ -27,7 +25,7 @@ public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionT
 
 	@NotNull
 	public String getGroupDisplayName() {
-		return SmellType.TEST.toString();
+		return SmellType.IMPLEMENTATION.toString();
 	}
 
 	@Override
@@ -41,10 +39,10 @@ public class TestMethodNamingInspection extends AbstractBaseJavaLocalInspectionT
 		return new JavaElementVisitor() {
 			@Override
 			public void visitMethod(PsiMethod method) {
-				List<TestSmell> smellsList = new ArrayList<>();
-				TestMethodNamingVisitor visitor = new TestMethodNamingVisitor(smellsList);
+				List<ImplementationSmell> smellsList = new ArrayList<>();
+				LongMethodVisitor visitor = new LongMethodVisitor(smellsList);
 				method.accept(visitor);
-				for (TestSmell smell : smellsList) {
+				for (ImplementationSmell smell : smellsList) {
 					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), quickFix);
 				}
 			}

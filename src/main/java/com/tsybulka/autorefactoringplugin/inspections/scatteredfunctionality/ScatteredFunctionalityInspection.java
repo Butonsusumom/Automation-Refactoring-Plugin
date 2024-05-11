@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
  */
 public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspectionTool {
 
-	//private final ObjectMethodParameterFix quickFix = new ObjectMethodParameterFix();
 	private static final String NAME = InspectionsBundle.message("inspection.scattered.functionality.display.name");
 
 	private final MetricsCalculationService metricsCalculationService = new MetricsCalculationService();
@@ -44,10 +43,9 @@ public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspe
 		List<PsiCodeBlock> codeBlocksCurrentFile = new ArrayList<>();
 
 		Project project = holder.getProject();
-		Map<String, Set<PsiElement>> seenCodeBlocks = new HashMap<>();
+		Map<Integer, Set<PsiElement>> seenCodeBlocks = new HashMap<>();
 
 		Set<PsiClass> classes = metricsCalculationService.collectPsiClassesFromSrc(project);
-		ScatteredFunctionalityVisitor visitor = new ScatteredFunctionalityVisitor(seenCodeBlocks);
 
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new PsiRecursiveElementVisitor() {
@@ -65,7 +63,7 @@ public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspe
 			@Override
 			public void visitCodeBlock(PsiCodeBlock block) {
 				super.visitCodeBlock(block);
-				for (Map.Entry<String, Set<PsiElement>> entry : seenCodeBlocks.entrySet()) {
+				for (Map.Entry<Integer, Set<PsiElement>> entry : seenCodeBlocks.entrySet()) {
 					Set<PsiElement> codeBlocks = entry.getValue();
 					if (codeBlocks.size() > 1 && codeBlocks.contains(block)) {
 						String scatteredClassesWithComma = getScatteredClasses(codeBlocks);
@@ -76,13 +74,13 @@ public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspe
 		};
 	}
 
-	void registerScatteredSmell(ProblemsHolder holder, Map<String, Set<PsiElement>> seenCodeBlocks, List<PsiCodeBlock> codeBlocksCurrentFile) {
-		Map<String, Set<PsiElement>> filteredMap = seenCodeBlocks.entrySet()
+	void registerScatteredSmell(ProblemsHolder holder, Map<Integer, Set<PsiElement>> seenCodeBlocks, List<PsiCodeBlock> codeBlocksCurrentFile) {
+		Map<Integer, Set<PsiElement>> filteredMap = seenCodeBlocks.entrySet()
 				.stream()
 				.filter(entry -> entry.getValue().size() >= 2) // Filter entries where the set has 2 or more elements
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-		for (Map.Entry<String, Set<PsiElement>> element : filteredMap.entrySet()) {
+		for (Map.Entry<Integer, Set<PsiElement>> element : filteredMap.entrySet()) {
 			Set<PsiElement> psiElements = element.getValue();
 			String scatteredClassesWithComma = getScatteredClasses(psiElements);
 

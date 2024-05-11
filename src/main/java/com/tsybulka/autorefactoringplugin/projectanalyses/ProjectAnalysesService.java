@@ -6,8 +6,10 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.MethodCyclomaticComplexityVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonVisitor;
+import com.tsybulka.autorefactoringplugin.inspections.longmethod.LongMethodVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.objectcomparison.ObjectComparisonVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterVisitor;
+import com.tsybulka.autorefactoringplugin.inspections.repeatedobjectcreation.RepeatedObjectCreationVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.scatteredfunctionality.ScatteredFunctionalityVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.testmethodnaming.TestMethodNamingVisitor;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
@@ -46,6 +48,8 @@ public class ProjectAnalysesService {
 		ObjectComparisonVisitor objectComparisonVisitor = new ObjectComparisonVisitor(implementationSmellsList);
 		ObjectMethodParameterVisitor objectMethodParameterVisitor = new ObjectMethodParameterVisitor(implementationSmellsList);
 		MethodCyclomaticComplexityVisitor cyclomaticComplexityVisitor = new MethodCyclomaticComplexityVisitor(implementationSmellsList);
+		RepeatedObjectCreationVisitor repeatedObjectCreationVisitor = new RepeatedObjectCreationVisitor(implementationSmellsList);
+		LongMethodVisitor longMethodVisitor = new LongMethodVisitor(implementationSmellsList);
 
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new PsiRecursiveElementVisitor() {
@@ -56,6 +60,8 @@ public class ProjectAnalysesService {
 					element.accept(objectComparisonVisitor);
 					element.accept(objectMethodParameterVisitor);
 					element.accept(cyclomaticComplexityVisitor);
+					element.accept(repeatedObjectCreationVisitor);
+					element.accept(longMethodVisitor);
 				}
 			});
 
@@ -66,7 +72,7 @@ public class ProjectAnalysesService {
 
 	Set<ArchitectureSmell> collectArchitectureSmells(Set<PsiClass> classes) {
 		Set<ArchitectureSmell> architectureSmellsList = new HashSet<>();
-		Map<String, Set<PsiElement>> seenCodeBlocks = new HashMap<>();
+		Map<Integer, Set<PsiElement>> seenCodeBlocks = new HashMap<>();
 
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new PsiRecursiveElementVisitor() {
@@ -101,13 +107,13 @@ public class ProjectAnalysesService {
 		return testSmellsList;
 	}
 
-	void registerScatteredSmell(Set<ArchitectureSmell> smellsList, Map<String, Set<PsiElement>> seenCodeBlocks) {
-		Map<String, Set<PsiElement>> filteredMap = seenCodeBlocks.entrySet()
+	void registerScatteredSmell(Set<ArchitectureSmell> smellsList, Map<Integer, Set<PsiElement>> seenCodeBlocks) {
+		Map<Integer, Set<PsiElement>> filteredMap = seenCodeBlocks.entrySet()
 				.stream()
 				.filter(entry -> entry.getValue().size() >= 2) // Filter entries where the set has 2 or more elements
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-		for (Map.Entry<String, Set<PsiElement>> element : filteredMap.entrySet()) {
+		for (Map.Entry<Integer, Set<PsiElement>> element : filteredMap.entrySet()) {
 			Set<PsiElement> psiElements = element.getValue();
 			String scatteredClassesWithComma = getScatteredClasses(psiElements, ", ");
 			String scatteredClassesWithNewLine = getScatteredClasses(psiElements, "\n");

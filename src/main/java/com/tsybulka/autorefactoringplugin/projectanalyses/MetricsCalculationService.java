@@ -131,8 +131,7 @@ public class MetricsCalculationService {
 	}
 
 	private int calculateLinesOfCode(PsiClass psiClass) {
-		PsiFile containingFile = psiClass.getContainingFile();
-		return (containingFile == null) ? 0 : StringUtil.countNewLines(containingFile.getText()) + 1;
+		return (psiClass == null) ? 0 : StringUtil.countNewLines(psiClass.getText()) + 1;
 	}
 
 	private int calculateNumberOfFields(PsiClass psiClass) {
@@ -163,9 +162,27 @@ public class MetricsCalculationService {
 		return count;
 	}
 
-	// Example for Weight of Class (WMC), simplified as total methods count here.
 	private int calculateWmc(PsiClass psiClass) {
-		return psiClass.getMethods().length; // Simplification, should be refined
+		int wmc = 0;
+
+		// Iterate through all methods of the class
+		for (PsiMethod method : psiClass.getMethods()) {
+			// Exclude constructors, static initializer blocks, and methods inherited from Object class
+			if (!method.isConstructor() &&
+					!method.hasModifierProperty(PsiModifier.STATIC) &&
+					!method.getContainingClass().getName().equals("Object")) {
+				wmc++;
+			}
+		}
+
+		// Include methods inherited from superclasses
+		PsiClass superClass = psiClass.getSuperClass();
+		while (superClass != null) {
+			wmc += superClass.getMethods().length;
+			superClass = superClass.getSuperClass();
+		}
+
+		return wmc;
 	}
 
 	private int calculateNumberOfChildren(PsiClass psiClass, Project project) {

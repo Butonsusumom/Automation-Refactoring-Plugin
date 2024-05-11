@@ -2,6 +2,7 @@ package com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.dial
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -9,8 +10,8 @@ import javax.swing.*;
 public class ComplexityComparisonDialog extends DialogWrapper {
 
 	private JPanel myMainPanel;
-	private JLabel originalComplexityLabel;
-	private JLabel newComplexityLabel;
+	private JLabel originalLoc;
+	private JLabel newNestingDepth;
 
 	public ComplexityComparisonDialog(@Nullable Project project, boolean canBeParent) {
 		super(project, canBeParent);
@@ -23,17 +24,23 @@ public class ComplexityComparisonDialog extends DialogWrapper {
 	}
 
 	public void setOriginalComplexity(int complexity) {
-		originalComplexityLabel.setText("Original Cyclomatic Complexity: " + complexity);
+		originalLoc.setText("Original Cyclomatic Complexity: " + complexity);
 	}
 
 	public void setNewComplexity(int complexity) {
-		newComplexityLabel.setText("New Cyclomatic Complexity: " + complexity);
+		newNestingDepth.setText("New Cyclomatic Complexity: " + complexity);
 	}
 
 	@Nullable
 	@Override
 	protected JComponent createCenterPanel() {
 		return myMainPanel;
+	}
+
+	@NotNull
+	@Override
+	protected Action @NotNull [] createActions() {
+		return new Action[]{getOKAction()}; // Return only the OK action
 	}
 
 }

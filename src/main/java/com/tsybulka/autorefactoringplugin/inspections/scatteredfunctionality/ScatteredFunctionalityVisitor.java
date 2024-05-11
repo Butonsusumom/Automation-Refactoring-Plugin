@@ -10,9 +10,9 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 
 	private static final String REPLACEMENT_VARIABLE_NAME = "var";
 
-	private Map<String, Set<PsiElement>> seenCodeBlocks;
+	private Map<Integer, Set<PsiElement>> seenCodeBlocks;
 
-	public ScatteredFunctionalityVisitor(Map<String, Set<PsiElement>> seenCodeBlocks) {
+	public ScatteredFunctionalityVisitor(Map<Integer, Set<PsiElement>> seenCodeBlocks) {
 		this.seenCodeBlocks = seenCodeBlocks;
 	}
 
@@ -34,7 +34,7 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 
 	private void processElement(PsiElement element) {
 		String normalizedCode = normalizePsiCodeBlock((PsiCodeBlock) element);
-		String codeHash = getHash(normalizedCode);
+		Integer codeHash = normalizedCode.hashCode();
 
 		if (seenCodeBlocks.containsKey(codeHash)) {
 			seenCodeBlocks.get(codeHash).add(element);
@@ -63,20 +63,7 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 	}
 
 	private void recursiveNormalize(PsiElement element, StringBuilder out, Set<String> declaredVariables) {
-		if (element == null) {
-			return;
-		}
-
-		if (element instanceof PsiWhiteSpace) {
-			// Simplify whitespace without introducing new lines
-			if (out.length() > 0 && !Character.isWhitespace(out.charAt(out.length() - 1))) {
-				out.append(' ');
-			}
-			return;
-		}
-
-		if (element instanceof PsiComment) {
-			// Ignore comments
+		if (element == null || element instanceof PsiWhiteSpace || element instanceof PsiComment) {
 			return;
 		}
 
@@ -102,7 +89,7 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 			PsiMethodCallExpression methodCall = (PsiMethodCallExpression) element;
 			PsiReferenceExpression methodExpression = methodCall.getMethodExpression();
 			if (methodExpression.getQualifierExpression() != null && declaredVariables.contains(methodExpression.getQualifierExpression().getText())) {
-				out.append("var.").append(methodExpression.getReferenceName());
+				out.append(REPLACEMENT_VARIABLE_NAME).append('.').append(methodExpression.getReferenceName());
 			} else {
 				recursiveNormalize(methodExpression, out, declaredVariables);
 			}
@@ -125,10 +112,6 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 		for (PsiElement child : element.getChildren()) {
 			recursiveNormalize(child, out, declaredVariables);
 		}
-	}
-
-	private String getHash(String input) {
-		return String.valueOf(input.hashCode());
 	}
 
 	private int countLines(PsiElement element) {

@@ -19,7 +19,7 @@ import java.util.List;
 public class MethodCyclomaticComplexityInspection extends AbstractBaseJavaLocalInspectionTool {
 
 	private final MethodCyclomaticComplexityFix quickFix = new MethodCyclomaticComplexityFix();
-	private static final String NAME = InspectionsBundle.message("cyclomatic.complexity.display.name");
+	private static final String NAME = InspectionsBundle.message("inspection.cyclomatic.complexity.display.name");
 
 	@NotNull
 	public String getDisplayName() {

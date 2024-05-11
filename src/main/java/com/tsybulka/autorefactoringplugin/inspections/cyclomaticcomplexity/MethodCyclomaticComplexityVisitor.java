@@ -12,9 +12,9 @@ import java.util.List;
 
 public class MethodCyclomaticComplexityVisitor extends CodeInspectionVisitor {
 
-	private static final String NAME = InspectionsBundle.message("cyclomatic.complexity.display.name");
+	private static final String NAME = InspectionsBundle.message("inspection.cyclomatic.complexity.display.name");
 
-	private CyclomaticComplexityVisitor cyclomaticComplexityVisitor = new CyclomaticComplexityVisitor();
+	private final CyclomaticComplexityVisitor cyclomaticComplexityVisitor = new CyclomaticComplexityVisitor();
 
 	private List<ImplementationSmell> implementationSmellsList;
 
@@ -56,7 +56,7 @@ public class MethodCyclomaticComplexityVisitor extends CodeInspectionVisitor {
 		}
 
 		implementationSmellsList.add(
-				new ImplementationSmell(NAME, packageName, InspectionsBundle.message("cyclomatic.complexity.problem.descriptor", complexity.toString()), ImplementationSmellType.CYCLOMATIC_COMPLEXITY, method, className, methodName));
+				new ImplementationSmell(NAME, packageName, InspectionsBundle.message("inspection.cyclomatic.complexity.problem.descriptor", complexity.toString()), ImplementationSmellType.CYCLOMATIC_COMPLEXITY, method, className, methodName));
 
 	}
 
