@@ -84,7 +84,7 @@ public class LongMethodFix implements LocalQuickFix {
 			if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
 				WriteCommandAction.runWriteCommandAction(project, () -> {
 					String className = dialog.getInputString();
-					//generateConstructorsAndGetters(paramClass, factory);
+					createParameterClass(factory, directory, className, oldParameters.getParameters());
 					PsiParameter newParam = factory.createParameter("params", PsiType.getTypeByName(className, project, GlobalSearchScope.allScope(project)));
 					method.getParameterList().replace(factory.createParameterList(new String[]{newParam.getName()}, new PsiType[]{newParam.getType()}));
 
@@ -214,7 +214,13 @@ public class LongMethodFix implements LocalQuickFix {
 		Project project = element.getProject();
 		boolean shouldRefactor = LongMethodDialogsProvider.showStartDialog(project);
 		if (shouldRefactor) {
-			int maxComplexity = 1;
+			return recursiveRefactor(element, type);
+		}
+		return false;
+	}
+
+	private boolean recursiveRefactor(PsiElement element, String type) {
+			int maxComplexity = 0;
 			PsiElement complexElement = null;
 			final int totalComplexity = getComplexity(element, type);
 			PsiElement[] childrenElement = getChildren(element);
@@ -232,14 +238,12 @@ public class LongMethodFix implements LocalQuickFix {
 			}
 
 			if (maxComplexity >= totalComplexity) {
-				return refactor(complexElement, type);
+				return recursiveRefactor(complexElement, type);
 			} else {
 				PsiElementLengthExtractVisitor extractVisitor = new PsiElementLengthExtractVisitor();
 				complexElement.accept(extractVisitor);
 				return extractVisitor.isRefactored();
 			}
-		}
-		return false;
 	}
 
 	private int getComplexity(PsiElement element, String type) {

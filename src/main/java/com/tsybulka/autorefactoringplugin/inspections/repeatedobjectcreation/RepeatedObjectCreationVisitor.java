@@ -1,7 +1,10 @@
 package com.tsybulka.autorefactoringplugin.inspections.repeatedobjectcreation;
 
 import com.intellij.psi.*;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Query;
 import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
@@ -99,7 +102,7 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 				// Filter out changed elements and constants
 				List<PsiNewExpression> unchangedElements = new ArrayList<>();
 				for (PsiNewExpression expression : expressions) {
-					if (isUnchanged(expression) && !isConstant(expression)) {
+					if (!isConstant(expression) && isUnchanged(expression)) {
 						unchangedElements.add(expression);
 					}
 				}
@@ -133,35 +136,63 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 		return false;
 	}
 
-	private boolean isUnchanged(PsiElement element) {
-		if (element instanceof PsiLocalVariable) {
-			PsiLocalVariable variable = (PsiLocalVariable) element;
-			PsiElement nextSibling = variable.getNextSibling();
-			while (nextSibling != null) {
-				if (nextSibling instanceof PsiExpressionStatement) {
-					PsiExpressionStatement expressionStatement = (PsiExpressionStatement) nextSibling;
-					PsiExpression expression = expressionStatement.getExpression();
+	private boolean isUnchanged(PsiNewExpression givenElement) {
+		PsiLocalVariable variable = findLocalVariableFromNewExpression(givenElement);
+		// Create a search scope limited to the containing file or function
+		if (variable!=null) {
+			LocalSearchScope scope = new LocalSearchScope(variable.getContainingFile());
 
-					// Check for assignment to the variable
-					if (expression instanceof PsiAssignmentExpression) {
-						PsiAssignmentExpression assignmentExpression = (PsiAssignmentExpression) expression;
-						if (isAssignmentToVariable(variable, assignmentExpression)) {
-							return false;
-						}
-					}
+			// Search for all references to the variable
+			Query<PsiReference> query = ReferencesSearch.search(variable, scope);
 
-					// Check for method calls on the variable
-					else if (expression instanceof PsiMethodCallExpression) {
-						PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) expression;
-						if (isMethodCallOnVariable(variable, methodCallExpression)) {
-							return false;
+			for (PsiReference reference : query) {
+				// Check if any of the references are used in method call expressions
+				PsiElement element = reference.getElement();
+				// Check if the parent of the variable usage is a method call expression
+				if (element.getParent() instanceof PsiReferenceExpression) {
+					PsiReferenceExpression referenceExpression = (PsiReferenceExpression) element.getParent();
+					if (referenceExpression.getParent() instanceof PsiMethodCallExpression) {
+						PsiMethodCallExpression methodCall = (PsiMethodCallExpression) referenceExpression.getParent();
+						// Check if the method call is on the variable
+						if (methodCall.getMethodExpression().getQualifierExpression() == referenceExpression) {
+							return false;  // Method is called on the variable
 						}
 					}
 				}
-				nextSibling = nextSibling.getNextSibling();
 			}
 		}
-		return true;
+
+		return true;  // No method calls found on the variable
+	}
+
+	public PsiLocalVariable findLocalVariableFromNewExpression(PsiNewExpression newExpression) {
+		// Get the parent of the new expression
+		PsiElement parent = newExpression.getParent();
+
+		// Check if the parent is a declaration statement
+		if (parent instanceof PsiVariable) {
+			PsiVariable variable = (PsiVariable) parent;
+			if (variable.getInitializer() == newExpression) {
+				if (variable instanceof PsiLocalVariable) {
+					return (PsiLocalVariable) variable;
+				}
+			}
+		} else if (parent instanceof PsiAssignmentExpression) {
+			PsiElement grandParent = parent.getParent();
+			if (grandParent instanceof PsiDeclarationStatement) {
+				PsiDeclarationStatement declaration = (PsiDeclarationStatement) grandParent;
+				for (PsiElement element : declaration.getDeclaredElements()) {
+					if (element instanceof PsiLocalVariable) {
+						PsiLocalVariable variable = (PsiLocalVariable) element;
+						if (variable.getInitializer() == newExpression) {
+							return variable;
+						}
+					}
+				}
+			}
+		}
+
+		return null; // Return null if no local variable found
 	}
 
 	private boolean isAssignmentToVariable(PsiLocalVariable variable, PsiAssignmentExpression assignmentExpression) {

@@ -44,7 +44,7 @@ public class MetricsCalculationService {
 		metrics.put(ClassMetricType.DEPTH_OF_INHERITANCE_TREE, calculateDepthOfInheritanceTree(psiClass));
 		metrics.put(LACK_OF_COHESION_IN_METHOD, calculateLackOfCohesionInMethods(psiClass));
 		metrics.put(ClassMetricType.FAN_IN, calculateFanIn(psiClass, project));
-		metrics.put(ClassMetricType.FAN_OUT, calculateFanOut(psiClass));
+		metrics.put(ClassMetricType.FAN_OUT, calculateFanOut(psiClass, project));
 
 		return metrics;
 	}
@@ -55,8 +55,9 @@ public class MetricsCalculationService {
 			Query<PsiReference> query = ReferencesSearch.search(method, GlobalSearchScope.projectScope(project));
 			for (PsiReference reference : query) {
 				PsiElement element = reference.getElement();
-				if (element instanceof PsiMethodCallExpression) {
-					PsiMethod callingMethod = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
+				PsiElement parent = element.getParent();
+				if (parent instanceof PsiMethodCallExpression) {
+					PsiMethod callingMethod = PsiTreeUtil.getParentOfType(parent, PsiMethod.class);
 					if (callingMethod != null) {
 						PsiClass containingClass = callingMethod.getContainingClass();
 						if (containingClass != null && !containingClass.equals(psiClass)) {
@@ -69,16 +70,18 @@ public class MetricsCalculationService {
 		return uniqueClassesReferencing.size();
 	}
 
-	public int calculateFanOut(PsiClass psiClass) {
+	public int calculateFanOut(PsiClass psiClass, Project project) {
 		Set<PsiClass> uniqueClassesCalled = new HashSet<>();
 		for (PsiMethod method : psiClass.getMethods()) {
-			for (PsiReference reference : ReferencesSearch.search(method)) {
+			Query<PsiReference> query = ReferencesSearch.search(method, GlobalSearchScope.projectScope(project));
+			for (PsiReference reference : query) {
 				PsiElement element = reference.getElement();
-				if (element instanceof PsiMethodCallExpression) {
-					PsiMethod calledMethod = ((PsiMethodCallExpression)element).resolveMethod();
+				PsiElement parent = element.getParent();
+				if (parent instanceof PsiMethodCallExpression) {
+					PsiMethod calledMethod = ((PsiMethodCallExpression)parent).resolveMethod();
 					if (calledMethod != null) {
 						PsiClass containingClass = calledMethod.getContainingClass();
-						if (containingClass != null && !containingClass.equals(psiClass)) {
+						if (containingClass != null && containingClass.equals(psiClass)) {
 							uniqueClassesCalled.add(containingClass);
 						}
 					}
@@ -165,6 +168,13 @@ public class MetricsCalculationService {
 	private int calculateWmc(PsiClass psiClass) {
 		int wmc = 0;
 
+		// Include methods inherited from superclasses
+		PsiClass superClass = psiClass.getSuperClass();
+		while (superClass != null && !superClass.getName().equals("Object")) {
+			wmc += superClass.getMethods().length;
+			superClass = superClass.getSuperClass();
+		}
+
 		// Iterate through all methods of the class
 		for (PsiMethod method : psiClass.getMethods()) {
 			// Exclude constructors, static initializer blocks, and methods inherited from Object class
@@ -173,13 +183,6 @@ public class MetricsCalculationService {
 					!method.getContainingClass().getName().equals("Object")) {
 				wmc++;
 			}
-		}
-
-		// Include methods inherited from superclasses
-		PsiClass superClass = psiClass.getSuperClass();
-		while (superClass != null) {
-			wmc += superClass.getMethods().length;
-			superClass = superClass.getSuperClass();
 		}
 
 		return wmc;

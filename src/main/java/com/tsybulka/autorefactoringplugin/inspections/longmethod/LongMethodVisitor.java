@@ -62,28 +62,34 @@ public class LongMethodVisitor extends CodeInspectionVisitor {
 	}
 
 	public static int calculateNestingDepth(PsiElement element) {
+		int currentDepth=0;
+
 		if (element == null) {
 			return 0;
 		}
+		if(isControlFlowElement(element)) {
+			currentDepth++;
+		}
 
 		// Use a recursive function to determine the maximum depth
-		return getMaxDepth(element, 0); // Start depth calculation inside the method body
+		return getMaxDepth(element, currentDepth); // Start depth calculation inside the method body
 	}
 
 	private static int getMaxDepth(PsiElement element, int currentDepth) {
+
 		int maxDepth = currentDepth;
 
 		// Iterate over all children of the current element
 		for (PsiElement child : element.getChildren()) {
+			int childDepth;
 			if (isControlFlowElement(child)) {
 				// If it's a control flow element or a code block, increase the depth
-				int childDepth = getMaxDepth(child, currentDepth + 1);
-				maxDepth = Math.max(maxDepth, childDepth);
+				childDepth = getMaxDepth(child, currentDepth + 1);
 			} else {
 				// Otherwise, continue searching through the current depth
-				int childDepth = getMaxDepth(child, currentDepth);
-				maxDepth = Math.max(maxDepth, childDepth);
+				childDepth = getMaxDepth(child, currentDepth);
 			}
+			maxDepth = Math.max(maxDepth, childDepth);
 		}
 		return maxDepth;
 	}
