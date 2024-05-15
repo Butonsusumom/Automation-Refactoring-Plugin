@@ -8,11 +8,16 @@ import com.tsybulka.autorefactoringplugin.ui.ReportDialog;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Action allows open project analyses dialog through Tools menu
  */
 public class AnalyzeCodeAction extends AnAction {
+
+	private static final Logger LOGGER = Logger.getLogger(AnalyzeCodeAction.class.getName());
 
 	private final ProjectAnalysesService projectAnalysesService = new ProjectAnalysesService();
 
@@ -28,10 +33,10 @@ public class AnalyzeCodeAction extends AnAction {
 				dialog.pack();
 				dialog.setLocationRelativeTo(null);
 				dialog.setVisible(true);
-				ImageIcon icon = new ImageIcon(getClass().getResource("/icons/pluginIcon.svg"));
+				ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/icons/pluginIcon.svg")));
 				dialog.setIconImage(icon.getImage());
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, "Failed to open the report dialog", e);
 			}
 		});
 	}

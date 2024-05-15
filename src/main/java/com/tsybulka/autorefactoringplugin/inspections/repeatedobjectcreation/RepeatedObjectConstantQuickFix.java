@@ -182,7 +182,7 @@ public class RepeatedObjectConstantQuickFix implements LocalQuickFix {
 		if (classReference == null) return null;
 
 		String className = classReference.getQualifiedName();
-		PsiExpression[] args = expression.getArgumentList().getExpressions();
+		PsiExpression[] args = Objects.requireNonNull(expression.getArgumentList()).getExpressions();
 		StringBuilder keyBuilder = new StringBuilder("new ").append(className).append("(");
 
 		for (PsiExpression arg : args) {

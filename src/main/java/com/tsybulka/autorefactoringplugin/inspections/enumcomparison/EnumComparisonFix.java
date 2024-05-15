@@ -28,7 +28,8 @@ public class EnumComparisonFix implements LocalQuickFix {
 	public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
 		PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) problemDescriptor.getPsiElement();
 		PsiMethod method = methodCallExpression.resolveMethod();
-		boolean isObjectsMethod = Objects.equals(method.getContainingClass().getQualifiedName(),"java.util.Objects");
+		assert method != null;
+		boolean isObjectsMethod = Objects.equals(Objects.requireNonNull(method.getContainingClass()).getQualifiedName(),"java.util.Objects");
 
 		PsiExpression lOperand;
 		PsiExpression rOperand;
@@ -57,6 +58,7 @@ public class EnumComparisonFix implements LocalQuickFix {
 		}
 
 		Objects.requireNonNull(equalsCall.getROperand()).replace(rOperand);
+		assert lOperand != null;
 		Objects.requireNonNull(equalsCall.getLOperand()).replace(lOperand);
 
 		if (parent instanceof PsiPrefixExpression) {

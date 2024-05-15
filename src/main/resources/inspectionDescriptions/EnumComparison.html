@@ -1,8 +1,10 @@
 <html lang="eng">
 <body>
 <p>
-    Using == for enum comparison ensures type safety, performance, and clear semantics, as it checks reference equality,
-    which is preferable over equals() due to enums' nature as typesafe constants.
+    Using '==' for enum comparison is appropriate due to enums being typesafe constants in Java. This approach ensures
+    type safety and high performance by checking reference equality, which is reliable for enums because they are
+    instantiated only once. Unlike equals(), using '==' avoids unnecessary method calls and improves code clarity and
+    efficiency.
 </p>
 </body>
 </html>

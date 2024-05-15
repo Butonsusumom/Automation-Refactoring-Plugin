@@ -1,8 +1,10 @@
 <html lang="en">
 <body>
 <p>
-    Repeated object creations detected in Java files. This inspection identifies instances where the same object is created multiple times through constructors or builders.
-    It suggests extracting these objects into constants to improve code maintainability and performance by reducing redundancy.
+    This smell arises when the same object is repeatedly created in the same way across different parts of a Java
+    application. Creating multiple instances of the same object can lead to unnecessary memory usage and performance
+    overhead. By identifying such patterns and refactoring to use shared instances or constants, code redundancy is
+    reduced, improving maintainability and performance.
 </p>
 </body>
 </html>

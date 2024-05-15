@@ -18,7 +18,7 @@ public class LongMethodVisitor extends CodeInspectionVisitor {
 	static final int MAX_PARAMS = 5;
 	static final int MAX_NESTING = 3;
 
-	private List<ImplementationSmell> smellsList;
+	private final List<ImplementationSmell> smellsList;
 
 	public LongMethodVisitor(List<ImplementationSmell> smellsList) {
 		this.smellsList = smellsList;
@@ -125,13 +125,13 @@ public class LongMethodVisitor extends CodeInspectionVisitor {
 	private String buildReasonForSmell(LengthyMetrics lengthyMetrics) {
 		StringBuilder reasonBuilder = new StringBuilder();
 		if (lengthyMetrics.getLoc() > MAX_LOC) {
-			reasonBuilder.append("Lines of code exceed " + MAX_LOC + ", current number of lines of code: " + lengthyMetrics.getLoc() + ".");
+			reasonBuilder.append("Lines of code exceed ").append(MAX_LOC).append(", current number of lines of code: ").append(lengthyMetrics.getLoc()).append(".");
 		}
 		if (lengthyMetrics.getNumOfParams() > MAX_PARAMS) {
-			reasonBuilder.append("Number of parameters exceed " + MAX_PARAMS + ", current number of parameters: " + lengthyMetrics.getNumOfParams() + ".");
+			reasonBuilder.append("Number of parameters exceed ").append(MAX_PARAMS).append(", current number of parameters: ").append(lengthyMetrics.getNumOfParams()).append(".");
 		}
 		if (lengthyMetrics.getMaxNestingDepth() > MAX_NESTING) {
-			reasonBuilder.append("Nesting depth exceeds " + MAX_NESTING + ", current nesting depth: " + lengthyMetrics.getMaxNestingDepth() + ".");
+			reasonBuilder.append("Nesting depth exceeds ").append(MAX_NESTING).append(", current nesting depth: ").append(lengthyMetrics.getMaxNestingDepth()).append(".");
 		}
 		return reasonBuilder.toString().trim();
 	}

@@ -170,7 +170,7 @@ public class MetricsCalculationService {
 
 		// Include methods inherited from superclasses
 		PsiClass superClass = psiClass.getSuperClass();
-		while (superClass != null && !superClass.getName().equals("Object")) {
+		while (superClass != null && !Objects.equals(superClass.getName(), "Object")) {
 			wmc += superClass.getMethods().length;
 			superClass = superClass.getSuperClass();
 		}
@@ -180,7 +180,7 @@ public class MetricsCalculationService {
 			// Exclude constructors, static initializer blocks, and methods inherited from Object class
 			if (!method.isConstructor() &&
 					!method.hasModifierProperty(PsiModifier.STATIC) &&
-					!method.getContainingClass().getName().equals("Object")) {
+					!Objects.equals(Objects.requireNonNull(method.getContainingClass()).getName(), "Object")) {
 				wmc++;
 			}
 		}

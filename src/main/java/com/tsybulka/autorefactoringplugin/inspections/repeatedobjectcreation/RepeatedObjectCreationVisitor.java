@@ -18,7 +18,7 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 	private static final String NAME = InspectionsBundle.message("inspection.repeated.object.creation.display.name");
 	private static final String DESCRIPTION = InspectionsBundle.message("inspection.repeated.object.creation.problem.descriptor");
 
-	private List<ImplementationSmell> smellsList;
+	private final List<ImplementationSmell> smellsList;
 
 	private final Map<String, List<PsiNewExpression>> objectInstances = new HashMap<>();
 	private static final Map<String, String> constantValues = new HashMap<>();
@@ -59,7 +59,7 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 		if (classReference == null) return null;
 
 		String className = classReference.getQualifiedName();
-		PsiExpression[] args = expression.getArgumentList().getExpressions();
+		PsiExpression[] args = Objects.requireNonNull(expression.getArgumentList()).getExpressions();
 		StringBuilder keyBuilder = new StringBuilder(className).append("(");
 
 		for (PsiExpression arg : args) {
@@ -193,30 +193,6 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 		}
 
 		return null; // Return null if no local variable found
-	}
-
-	private boolean isAssignmentToVariable(PsiLocalVariable variable, PsiAssignmentExpression assignmentExpression) {
-		if (assignmentExpression.getLExpression() instanceof PsiReferenceExpression) {
-			PsiReferenceExpression leftExpression = (PsiReferenceExpression) assignmentExpression.getLExpression();
-			return leftExpression.resolve() == variable;
-		}
-		return false;
-	}
-
-	private boolean isMethodCallOnVariable(PsiLocalVariable variable, PsiMethodCallExpression methodCallExpression) {
-		PsiReferenceExpression methodExpression = methodCallExpression.getMethodExpression();
-		PsiElement resolvedElement = methodExpression.resolve();
-
-		if (resolvedElement instanceof PsiMethod) {
-			PsiMethod method = (PsiMethod) resolvedElement;
-			if (!method.getModifierList().hasModifierProperty(PsiModifier.STATIC)) {
-				if (methodExpression.getQualifierExpression() instanceof PsiReferenceExpression) {
-					PsiReferenceExpression qualifier = (PsiReferenceExpression) methodExpression.getQualifierExpression();
-					return qualifier.resolve() == variable;
-				}
-			}
-		}
-		return false;
 	}
 
 	private boolean isConstant(PsiElement element) {

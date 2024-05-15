@@ -13,6 +13,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class MethodCyclomaticComplexityFix implements LocalQuickFix {
 
 	private static final String FIX_MESSAGE = InspectionsBundle.message("inspection.cyclomatic.complexity.use.quickfix");
@@ -78,8 +80,8 @@ public class MethodCyclomaticComplexityFix implements LocalQuickFix {
 		if (element instanceof PsiIfStatement) {
 			PsiIfStatement ifStatement = (PsiIfStatement) element;
 			childrenElement = ArrayUtils.addAll(
-					ifStatement.getThenBranch().getChildren(),
-					ifStatement.getElseBranch().getChildren()
+					Objects.requireNonNull(ifStatement.getThenBranch()).getChildren(),
+					Objects.requireNonNull(ifStatement.getElseBranch()).getChildren()
 			);
 			childrenElement = ArrayUtils.add(childrenElement, ifStatement.getCondition());
 		} else if (element instanceof PsiMethodCallExpression) {

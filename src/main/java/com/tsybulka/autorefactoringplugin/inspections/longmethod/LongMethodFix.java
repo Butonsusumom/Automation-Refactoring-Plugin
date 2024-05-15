@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.tsybulka.autorefactoringplugin.inspections.longmethod.LongMethodVisitor.*;
@@ -62,7 +63,7 @@ public class LongMethodFix implements LocalQuickFix {
 		Project project = method.getProject();
 		boolean shouldRefactor = LongMethodDialogsProvider.showStartExtractParametersDialog(project);
 		if (shouldRefactor) {
-			PsiDirectory directory = method.getContainingClass().getContainingFile().getContainingDirectory();
+			PsiDirectory directory = Objects.requireNonNull(method.getContainingClass()).getContainingFile().getContainingDirectory();
 
 			PsiParameterList oldParameters = method.getParameterList();
 			if (method.getParameterList().getParameters().length <= 3) {
@@ -85,6 +86,7 @@ public class LongMethodFix implements LocalQuickFix {
 				WriteCommandAction.runWriteCommandAction(project, () -> {
 					String className = dialog.getInputString();
 					createParameterClass(factory, directory, className, oldParameters.getParameters());
+					assert className != null;
 					PsiParameter newParam = factory.createParameter("params", PsiType.getTypeByName(className, project, GlobalSearchScope.allScope(project)));
 					method.getParameterList().replace(factory.createParameterList(new String[]{newParam.getName()}, new PsiType[]{newParam.getType()}));
 
@@ -116,13 +118,13 @@ public class LongMethodFix implements LocalQuickFix {
 		for (PsiField field : paramClass.getFields()) {
 			// Create getters for each field
 			PsiMethod getter = factory.createMethod("get" + capitalize(field.getName()), field.getType());
-			getter.getBody().add(factory.createStatementFromText("return this." + field.getName() + ";", getter));
+			Objects.requireNonNull(getter.getBody()).add(factory.createStatementFromText("return this." + field.getName() + ";", getter));
 			paramClass.add(getter);
 
 			// Create constructor parameters and assign them
 			fullConstructor.getParameterList().add(factory.createParameter(field.getName(), field.getType()));
 			String assignmentText = "this." + field.getName() + " = " + field.getName() + ";";
-			fullConstructor.getBody().add(factory.createStatementFromText(assignmentText, fullConstructor));
+			Objects.requireNonNull(fullConstructor.getBody()).add(factory.createStatementFromText(assignmentText, fullConstructor));
 		}
 
 		// Add constructors to the class
@@ -183,7 +185,7 @@ public class LongMethodFix implements LocalQuickFix {
 								PsiExpression[] oldArguments = argumentList.getExpressions();
 
 								// Build the new method call as a string
-								StringBuilder newMethodCallBuilder = new StringBuilder(methodCall.getMethodExpression().getReferenceName()).append("(new ").append(className);
+								StringBuilder newMethodCallBuilder = new StringBuilder(Objects.requireNonNull(methodCall.getMethodExpression().getReferenceName())).append("(new ").append(className);
 								newMethodCallBuilder.append("(");
 								for (int i = 0; i < oldArguments.length; i++) {
 									if (i > 0) newMethodCallBuilder.append(", ");
@@ -263,7 +265,7 @@ public class LongMethodFix implements LocalQuickFix {
 		PsiElement[] childrenElement;
 		if (element instanceof PsiIfStatement) {
 			PsiIfStatement ifStatement = (PsiIfStatement) element;
-			childrenElement = ArrayUtils.addAll(ifStatement.getThenBranch().getChildren(), ifStatement.getElseBranch().getChildren());
+			childrenElement = ArrayUtils.addAll(Objects.requireNonNull(ifStatement.getThenBranch()).getChildren(), Objects.requireNonNull(ifStatement.getElseBranch()).getChildren());
 			childrenElement = ArrayUtils.add(childrenElement, ifStatement.getCondition());
 		} else if (element instanceof PsiMethodCallExpression) {
 			PsiMethodCallExpression expression = (PsiMethodCallExpression) element;
