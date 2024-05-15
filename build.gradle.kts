@@ -39,8 +39,8 @@ intellij {
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        sourceCompatibility = "8"
+        targetCompatibility = "8"
     }
 
     test {
