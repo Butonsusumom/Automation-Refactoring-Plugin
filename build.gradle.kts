@@ -18,7 +18,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testImplementation("junit:junit:3.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     testImplementation("org.mockito:mockito-core:3.12.4")
     testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
@@ -28,6 +27,7 @@ dependencies {
 
 jacoco {
     toolVersion = "0.8.7"
+    reportsDirectory.set(layout.buildDirectory.dir("reports"))
 }
 
 java {
@@ -53,7 +53,9 @@ tasks {
         finalizedBy(jacocoTestReport)
     }
 
+
     jacocoTestReport {
+        enabled = true
         dependsOn(test)
         reports {
             xml.required.set(false)
@@ -64,6 +66,8 @@ tasks {
             xml.outputLocation.set(layout.projectDirectory.file(".qodana/code-coverage/result.xml").asFile)
         }
         additionalSourceDirs.setFrom(files("src/main/java"))
+        sourceDirectories.setFrom(files("src/main/java"))
+        classDirectories.setFrom(fileTree("build/classes"))
     }
 
     withType<JavaCompile> {
