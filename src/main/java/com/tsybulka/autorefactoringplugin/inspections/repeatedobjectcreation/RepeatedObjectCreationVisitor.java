@@ -48,10 +48,21 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 	@Override
 	public void visitNewExpression(PsiNewExpression expression) {
 		super.visitNewExpression(expression);
-		String objectKey = createObjectKey(expression);
-		if (objectKey != null) {
-			objectInstances.computeIfAbsent(objectKey, k -> new ArrayList<>()).add(expression);
+		if (!isEmptyConstructor(expression)) {
+			String objectKey = createObjectKey(expression);
+			if (objectKey != null) {
+				objectInstances.computeIfAbsent(objectKey, k -> new ArrayList<>()).add(expression);
+			}
 		}
+	}
+
+	public boolean isEmptyConstructor(PsiNewExpression newExpression) {
+		PsiJavaCodeReferenceElement classReference = newExpression.getClassReference();
+		if (classReference != null) {
+			PsiExpressionList argumentList = newExpression.getArgumentList();
+			return argumentList != null && argumentList.getExpressions().length == 0; // It's an empty constructor
+		}
+		return false; // Not an empty constructor
 	}
 
 	public static String createObjectKey(PsiNewExpression expression) {

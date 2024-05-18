@@ -2,15 +2,25 @@ package com.tsybulka.autorefactoringplugin.inspections.objectparameter;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.projectanalyses.MetricsCalculationService;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 public class ObjectMethodParameterFix implements LocalQuickFix {
+
+	@SafeFieldForPreview
+	private final MetricsCalculationService metricsCalculationService = new MetricsCalculationService();
 
 	@Nls
 	@NotNull
@@ -23,10 +33,78 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 	public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
 		PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
 		PsiParameter parameter = (PsiParameter) problemDescriptor.getPsiElement();
-		PsiField field = replaceFieldUsageWithParameter(parameter, factory);
+		PsiMethod containingMethod = findContainingMethod(parameter);
+		List<PsiMethodCallExpression> methodCalls = findMethodCallsUsingParameter(project, containingMethod);
+		int parameterIndex = getParameterIndex(parameter, containingMethod);
+		PsiField field = replaceFieldUsageWithParameter(parameter, factory, containingMethod);
 		if (field != null) {
 			replaceParameterWithField(factory, parameter, field);
+			adjustMethodCalls(methodCalls, parameterIndex, field, factory);
 		}
+	}
+
+	private void adjustMethodCalls(List<PsiMethodCallExpression> methodCalls, int parameterIndex, PsiField field, PsiElementFactory factory) {
+		for (PsiMethodCallExpression callExpression : methodCalls) {
+			try {
+				PsiExpressionList argumentList = callExpression.getArgumentList();
+				PsiExpression[] arguments = argumentList.getExpressions();
+
+				if (parameterIndex != -1 && parameterIndex < arguments.length) {
+					String fieldName = field.getName();
+					StringBuilder stringBuilder = new StringBuilder(arguments[parameterIndex].getText()).append(".");
+					if (isFieldPublic(field)){
+						stringBuilder.append(fieldName);
+					} else {
+						stringBuilder.append("get").append(StringUtils.capitalize(fieldName)).append("()");
+					}
+					PsiExpression fieldAccessExpression = factory.createExpressionFromText(stringBuilder.toString(), null);
+					arguments[parameterIndex].replace(fieldAccessExpression);
+				}
+			} catch (IncorrectOperationException e) {
+				Logger.getInstance(ObjectMethodParameterFix.class).error("Failed to adjust method call", e);
+			}
+		}
+	}
+
+	public boolean isFieldPublic(PsiField field) {
+		if (field != null) {
+			PsiModifierList modifierList = field.getModifierList();
+			return modifierList != null && modifierList.hasModifierProperty(PsiModifier.PUBLIC);
+		}
+		return false;
+	}
+
+	public List<PsiMethodCallExpression> findMethodCallsUsingParameter(Project project, PsiMethod containingMethod) {
+		if (containingMethod == null) {
+			return new ArrayList<>(); // Return an empty list if the method is null
+		}
+
+		Set<PsiClass> classes = metricsCalculationService.collectPsiClassesFromSrc(project);
+
+		List<PsiMethodCallExpression> methodCalls = new ArrayList<>();
+
+		for (PsiClass psiClass : classes) {
+			psiClass.accept(new JavaRecursiveElementVisitor() {
+				@Override
+				public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+					super.visitMethodCallExpression(expression);
+					if (isCallOfMethod(expression, containingMethod)) {
+						methodCalls.add(expression); // Add each found method call expression to the list
+					}
+				}
+			});
+		}
+
+		return methodCalls;
+	}
+
+	private boolean isCallOfMethod(PsiMethodCallExpression callExpression, PsiMethod targetMethod) {
+		if (callExpression == null || targetMethod == null) {
+			return false; // Return false if either parameter is null
+		}
+
+		PsiMethod resolvedMethod = callExpression.resolveMethod();
+		return resolvedMethod != null && resolvedMethod.equals(targetMethod);
 	}
 
 	private void replaceParameterWithField(PsiElementFactory factory, PsiParameter parameter, PsiField field) {
@@ -38,10 +116,9 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 		}
 	}
 
-	private PsiField replaceFieldUsageWithParameter(PsiParameter parameter, PsiElementFactory factory) {
+	private PsiField replaceFieldUsageWithParameter(PsiParameter parameter, PsiElementFactory factory, PsiMethod method) {
 		// Navigate up the PSI tree to find the containing method
 		final PsiField[] objectField = new PsiField[1];
-		PsiMethod method = findContainingMethod(parameter);
 		method.accept(new JavaRecursiveElementVisitor() {
 			@Override
 			public void visitReferenceExpression(PsiReferenceExpression expression) {
@@ -63,6 +140,18 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 			}
 		});
 		return objectField[0];
+	}
+
+	public static int getParameterIndex(PsiParameter parameter, PsiMethod containingMethod) {
+		if (containingMethod != null) {
+			PsiParameter[] parameters = containingMethod.getParameterList().getParameters();
+			for (int i = 0; i < parameters.length; i++) {
+				if (parameter.equals(parameters[i])) {
+					return i; // Return the index if found
+				}
+			}
+		}
+		return -1; // Return -1 if the parameter is not found or if there is no containing method
 	}
 
 	private PsiMethodCallExpression getMethodCallFromReference(PsiReferenceExpression referenceExpression) {

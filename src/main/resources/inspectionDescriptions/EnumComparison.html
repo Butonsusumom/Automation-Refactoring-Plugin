@@ -1,10 +1,29 @@
-<html lang="eng">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Code Inspection - Enum Comparison</title>
+    <style>
+        body {
+            padding: 20px; /* Adds padding around the content */
+        }
+        .tooltip {
+            max-width: 600px; /* Constrains the paragraph width for easier reading */
+            padding: 20px; /* Adds padding inside the paragraph */
+            border-left: 5px solid #0078D7; /* Blue accent bar on the left for emphasis */
+            text-align: left; /* Aligns text to the left for readability */
+            position: absolute; /* Ensures it can float over other content */
+            bottom: 20px; /* Positions the tooltip towards the bottom of the screen */
+            right: 20px; /* Positions the tooltip towards the right of the screen */
+            z-index: 1000; /* Ensures it appears above other content */
+            overflow: hidden; /* Prevents overflow issues */
+            white-space: normal; /* Ensures text wraps properly */
+        }
+    </style>
+</head>
 <body>
-<p>
-    Using '==' for enum comparison is appropriate due to enums being typesafe constants in Java. This approach ensures
-    type safety and high performance by checking reference equality, which is reliable for enums because they are
-    instantiated only once. Unlike equals(), using '==' avoids unnecessary method calls and improves code clarity and
-    efficiency.
-</p>
+<div class="tooltip">
+    Using '==' for enum comparison is appropriate due to enums being typesafe constants in Java. This approach ensures type safety and high performance by checking reference equality, which is reliable for enums because they are instantiated only once. Unlike equals(), using '==' avoids unnecessary method calls and improves code clarity and efficiency.
+</div>
 </body>
 </html>

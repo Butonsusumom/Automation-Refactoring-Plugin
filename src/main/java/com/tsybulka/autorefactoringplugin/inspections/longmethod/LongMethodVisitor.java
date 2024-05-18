@@ -34,14 +34,17 @@ public class LongMethodVisitor extends CodeInspectionVisitor {
 		if (isInspectionEnabled()) {
 			super.visitMethod(method);
 			LengthyMetrics lengthyMetrics = new LengthyMetrics(getLinesOfCode(method), getNumberOfParameters(method), calculateNestingDepth(method));
-			if (!isLongMethodAcceptable(lengthyMetrics)) {
+			if (!isLongMethodAcceptable(lengthyMetrics, method)) {
 				registerSmell(method, lengthyMetrics);
 			}
 		}
 	}
 
-	private boolean isLongMethodAcceptable(LengthyMetrics metrics) {
-		return metrics.getLoc() <= MAX_LOC && metrics.getNumOfParams() <= MAX_PARAMS && metrics.getMaxNestingDepth() <= MAX_NESTING;
+	private boolean isLongMethodAcceptable(LengthyMetrics metrics, PsiMethod method) {
+		if (!method.isConstructor()) {
+			return metrics.getLoc() <= MAX_LOC && metrics.getNumOfParams() <= MAX_PARAMS && metrics.getMaxNestingDepth() <= MAX_NESTING;
+		}
+		return true;
 	}
 
 	static int getLinesOfCode(PsiElement element) {

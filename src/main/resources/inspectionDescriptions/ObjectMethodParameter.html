@@ -1,9 +1,29 @@
-<html lang="eng">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Code Inspection - Unnecessary Method Parameter</title>
+    <style>
+        body {
+            padding: 20px; /* Adds padding around the content */
+        }
+        .tooltip {
+            max-width: 600px; /* Constrains the paragraph width for easier reading */
+            padding: 20px; /* Adds padding inside the paragraph */
+            border-left: 5px solid #0078D7; /* Blue accent bar on the left for emphasis */
+            text-align: left; /* Aligns text to the left for readability */
+            position: absolute; /* Ensures it can float over other content */
+            bottom: 20px; /* Positions the tooltip towards the bottom of the screen */
+            right: 20px; /* Positions the tooltip towards the right of the screen */
+            z-index: 1000; /* Ensures it appears above other content */
+            overflow: hidden; /* Prevents overflow issues */
+            white-space: normal; /* Ensures text wraps properly */
+        }
+    </style>
+</head>
 <body>
-<p>
-    Methods should be refactored to accept only the parameters they use. Passing unnecessary data into methods can lead
-    to increased coupling and complexity, making the system harder to understand and modify. Simplifying method
-    signatures by reducing parameters to only those that are used enhances code clarity and cohesion.
-</p>
+<div class="tooltip">
+    Methods should be refactored to accept only the parameters they use. Passing unnecessary data into methods can lead to increased coupling and complexity, making the system harder to understand and modify. Simplifying method signatures by reducing parameters to only those that are used enhances code clarity and cohesion.
+</div>
 </body>
 </html>
