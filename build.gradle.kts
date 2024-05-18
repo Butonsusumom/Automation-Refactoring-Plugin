@@ -14,13 +14,20 @@ repositories {
 
 dependencies {
     implementation("org.projectlombok:lombok:1.18.28")
-    implementation("org.projectlombok:lombok:1.18.28")
-    testImplementation("junit:junit:4.13.2")
     implementation("org.knowm.xchart:xchart:3.8.7")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testImplementation("junit:junit:3.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 java {
@@ -37,22 +44,31 @@ intellij {
 }
 
 tasks {
-    // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = "8"
-        targetCompatibility = "8"
-    }
 
     test {
+        useJUnitPlatform()
+        testLogging {
+            events("started", "passed", "skipped", "failed")
+        }
         finalizedBy(jacocoTestReport)
     }
 
     jacocoTestReport {
+        dependsOn(test)
         reports {
             xml.required.set(false)
             csv.required.set(false)
-            html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+            html.required.set(true)
+            xml.required.set(true)
+            html.outputLocation.set(layout.projectDirectory.dir(".qodana/code-coverage/resultHTML"))
+            xml.outputLocation.set(layout.projectDirectory.file(".qodana/code-coverage/result.xml").asFile)
         }
+        additionalSourceDirs.setFrom(files("src/main/java"))
+    }
+
+    withType<JavaCompile> {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 
     patchPluginXml {
