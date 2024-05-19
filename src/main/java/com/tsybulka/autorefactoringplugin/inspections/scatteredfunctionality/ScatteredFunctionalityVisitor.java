@@ -10,7 +10,7 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 
 	private static final String REPLACEMENT_VARIABLE_NAME = "var";
 
-	private Map<Integer, Set<PsiElement>> seenCodeBlocks;
+	private final Map<Integer, Set<PsiElement>> seenCodeBlocks;
 
 	public ScatteredFunctionalityVisitor(Map<Integer, Set<PsiElement>> seenCodeBlocks) {
 		this.seenCodeBlocks = seenCodeBlocks;
@@ -62,13 +62,12 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 		return variables;
 	}
 
-	private void recursiveNormalize(PsiElement element, StringBuilder out, Set<String> declaredVariables) {
+	void recursiveNormalize(PsiElement element, StringBuilder out, Set<String> declaredVariables) {
 		if (element == null || element instanceof PsiWhiteSpace || element instanceof PsiComment) {
 			return;
 		}
 
-		if (element instanceof PsiReferenceExpression) {
-			PsiReferenceExpression refExp = (PsiReferenceExpression) element;
+		if (element instanceof PsiReferenceExpression refExp) {
 			PsiElement qualifier = refExp.getQualifierExpression();
 			if (qualifier != null && declaredVariables.contains(qualifier.getText())) {
 				// Replace the target variable name in the qualifier
@@ -85,8 +84,7 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 			return;
 		}
 
-		if (element instanceof PsiMethodCallExpression) {
-			PsiMethodCallExpression methodCall = (PsiMethodCallExpression) element;
+		if (element instanceof PsiMethodCallExpression methodCall) {
 			PsiReferenceExpression methodExpression = methodCall.getMethodExpression();
 			if (methodExpression.getQualifierExpression() != null && declaredVariables.contains(methodExpression.getQualifierExpression().getText())) {
 				out.append(REPLACEMENT_VARIABLE_NAME).append('.').append(methodExpression.getReferenceName());
@@ -114,7 +112,7 @@ public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 		}
 	}
 
-	private int countLines(PsiElement element) {
+	int countLines(PsiElement element) {
 		if (element == null) {
 			return 0; // Early return if the element is null
 		}

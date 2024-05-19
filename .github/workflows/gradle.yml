@@ -84,7 +84,7 @@ jobs:
     - name: Archive coverage data
       uses: actions/upload-artifact@v2
       with:
-        name: jacoco-report
+        name: jest-coverage-data
         path: .qodana/code-coverage
           
     - name: Qodana Scan
@@ -92,7 +92,6 @@ jobs:
       env:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
-        args: "-i,.,--linter,jetbrains/qodana-jvm:latest"
         pr-mode: true # Enable the pull-request mode
 
   dependency-submission:

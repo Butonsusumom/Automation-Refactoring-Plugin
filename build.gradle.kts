@@ -2,7 +2,6 @@
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.17.2"
-    id("jacoco")
 }
 
 group = "com.tsybulka"
@@ -15,6 +14,8 @@ repositories {
 dependencies {
     implementation("org.projectlombok:lombok:1.18.28")
     implementation("org.knowm.xchart:xchart:3.8.7")
+    implementation("org.projectlombok:lombok:1.18.28")
+    testImplementation("junit:junit:4.13.2")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
@@ -23,11 +24,6 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
-}
-
-jacoco {
-    toolVersion = "0.8.7"
-    reportsDirectory.set(layout.buildDirectory.dir("reports"))
 }
 
 java {
@@ -47,32 +43,6 @@ tasks {
 
     test {
         useJUnitPlatform()
-        testLogging {
-            events("started", "passed", "skipped", "failed")
-        }
-        finalizedBy(jacocoTestReport)
-    }
-
-
-    jacocoTestReport {
-        enabled = true
-        dependsOn(test)
-        reports {
-            xml.required.set(false)
-            csv.required.set(false)
-            html.required.set(true)
-            xml.required.set(true)
-            html.outputLocation.set(layout.projectDirectory.dir(".qodana/code-coverage/resultHTML"))
-            xml.outputLocation.set(layout.projectDirectory.file(".qodana/code-coverage/result.xml").asFile)
-        }
-        additionalSourceDirs.setFrom(files("src/main/java"))
-        sourceDirectories.setFrom(files("src/main/java"))
-        classDirectories.setFrom(fileTree("build/classes"))
-    }
-
-    withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
     }
 
     patchPluginXml {
