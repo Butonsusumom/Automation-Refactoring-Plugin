@@ -1,0 +1,32 @@
+= Automated Refactoring Plugin User Documentation
+Ksenia Tsybulka
+:toc: left
+:sectnums:
+:icons: font
+
+== Overview
+The Automated Refactoring Plugin for IntelliJ IDEA enhances code quality by identifying and refactoring code smells in Java projects. It integrates seamlessly with the IDE, providing developers with tools to improve code maintainability and readability.
+
+== Installation
+To install the Automated Refactoring Plugin, follow these steps:
+
+. Open IntelliJ IDEA.
+. Navigate to the **Settings > Plugins**.
+. Click **Browse repositories…**
+. Search for "AutoRefactor Plugin" and select **Install**.
+. Restart IntelliJ IDEA to complete the installation.
+
+== Getting Started
+. Open your project in IntelliJ IDEA.
+. Navigate to **Tools > Analyze Project** to access the projects code smells overview.
+. Use the dashboard to configure settings and initiate code refactoring tasks.
+
+== Configuring Plugin Settings
+. Go to **File > Settings > AutoRefactor Plugin Settings**.
+. Adjust the thresholds for code smell detection and specify the refactoring rules to apply.
+
+== Running Code Inspections and Applying Refactorings
+. Right-click on the project or a specific Java file in the Project Explorer.
+. Select **Refactor > Detect and Refactor Code Smells**.
+. Review the suggestions and apply refactorings either individually or in bulk.
+

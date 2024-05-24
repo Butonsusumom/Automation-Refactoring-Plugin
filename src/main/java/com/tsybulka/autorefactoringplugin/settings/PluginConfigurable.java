@@ -48,11 +48,13 @@ public class PluginConfigurable implements Configurable {
 		settings.setRecurringObjectCreationCheck(pluginSettingsComponent.getRecurringObjectCreationCheckBox().isSelected());
 		if (isCyclomaticComplexityValid(pluginSettingsComponent)) {
 			settings.setCyclomaticComplexity(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()));
+			pluginSettingsComponent.getErrorCyclomaticComplexityLabel().setVisible(false);
 		} else {
 			pluginSettingsComponent.getErrorCyclomaticComplexityLabel().setVisible(true);
 		}
 		if (isRegExpValid(pluginSettingsComponent)) {
 			settings.setTestMethodNamingRegExp(pluginSettingsComponent.getTestMethodNamingRegexField().getText());
+			pluginSettingsComponent.getErrorTestMethodNamingLabel().setVisible(false);
 		} else {
 			pluginSettingsComponent.getErrorTestMethodNamingLabel().setVisible(true);
 		}
