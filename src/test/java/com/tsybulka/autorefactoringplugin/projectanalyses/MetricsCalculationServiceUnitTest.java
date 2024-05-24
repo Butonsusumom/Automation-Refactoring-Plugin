@@ -1,13 +1,15 @@
 package com.tsybulka.autorefactoringplugin.projectanalyses;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
+import com.intellij.util.Query;
 import com.tsybulka.autorefactoringplugin.model.metric.ClassMetricType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.metric.ClassMetrics;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +21,11 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.Query;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -110,7 +110,6 @@ public class MetricsCalculationServiceUnitTest {
 		PsiReference mockReference = mock(PsiReference.class);
 		PsiMethodCallExpression mockExpression = mock(PsiMethodCallExpression.class);
 		PsiMethod mockCallingMethod = mock(PsiMethod.class);
-		PsiClass mockReferencingClass = mock(PsiClass.class);
 		Project mockProject = mock(Project.class);
 
 		// Mocking the responses needed for the method to function properly
@@ -162,7 +161,7 @@ public class MetricsCalculationServiceUnitTest {
 		}
 
 		@Override
-		public Collection<T> findAll() {
+		public @NotNull Collection<T> findAll() {
 			return results;
 		}
 
@@ -177,7 +176,7 @@ public class MetricsCalculationServiceUnitTest {
 		}
 
 		@Override
-		public Iterator<T> iterator() {
+		public @NotNull Iterator<T> iterator() {
 			return results.iterator();
 		}
 	}

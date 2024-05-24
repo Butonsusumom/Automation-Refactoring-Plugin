@@ -4,7 +4,9 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
 

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class PluginConfigurable implements Configurable {
-	private PluginSettingsComponent pluginSettingsComponent;
+	PluginSettingsComponent pluginSettingsComponent;
 	private final PluginSettings settings = PluginSettings.getInstance();
 
 	@Nls(capitalization = Nls.Capitalization.Title)
@@ -22,8 +22,8 @@ public class PluginConfigurable implements Configurable {
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		pluginSettingsComponent = new PluginSettingsComponent();
-		return pluginSettingsComponent.getPanel();
+		this.pluginSettingsComponent = new PluginSettingsComponent();
+		return this.pluginSettingsComponent.getPanel();
 	}
 
 	@Override
@@ -48,11 +48,13 @@ public class PluginConfigurable implements Configurable {
 		settings.setRecurringObjectCreationCheck(pluginSettingsComponent.getRecurringObjectCreationCheckBox().isSelected());
 		if (isCyclomaticComplexityValid(pluginSettingsComponent)) {
 			settings.setCyclomaticComplexity(Integer.parseInt(pluginSettingsComponent.getCyclomaticComplexityNumericalField().getText()));
+			pluginSettingsComponent.getErrorCyclomaticComplexityLabel().setVisible(false);
 		} else {
 			pluginSettingsComponent.getErrorCyclomaticComplexityLabel().setVisible(true);
 		}
 		if (isRegExpValid(pluginSettingsComponent)) {
 			settings.setTestMethodNamingRegExp(pluginSettingsComponent.getTestMethodNamingRegexField().getText());
+			pluginSettingsComponent.getErrorTestMethodNamingLabel().setVisible(false);
 		} else {
 			pluginSettingsComponent.getErrorTestMethodNamingLabel().setVisible(true);
 		}
@@ -75,11 +77,11 @@ public class PluginConfigurable implements Configurable {
 		pluginSettingsComponent = null;
 	}
 
-	private boolean isCyclomaticComplexityValid(PluginSettingsComponent settings) {
+	boolean isCyclomaticComplexityValid(PluginSettingsComponent settings) {
 		return Integer.parseInt(settings.getCyclomaticComplexityNumericalField().getText()) <= 20;
 	}
 
-	private boolean isRegExpValid(PluginSettingsComponent settings) {
+	boolean isRegExpValid(PluginSettingsComponent settings) {
 		try {
 			Pattern.compile(settings.getTestMethodNamingRegexField().getText());
 			return true;  // No exception thrown, so the regex is valid

@@ -24,6 +24,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+    testImplementation("junit:junit:3.8.2") // Add this line for JUnit 3
 }
 
 java {
@@ -43,6 +44,9 @@ tasks {
 
     test {
         useJUnitPlatform()
+        testLogging {
+            events("started", "passed", "skipped", "failed")
+        }
     }
 
     patchPluginXml {

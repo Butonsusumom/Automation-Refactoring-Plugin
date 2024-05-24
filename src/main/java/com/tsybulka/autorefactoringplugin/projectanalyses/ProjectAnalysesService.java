@@ -128,7 +128,7 @@ public class ProjectAnalysesService {
 		}
 	}
 
-	private String getPackageName(PsiElement element) {
+	String getPackageName(PsiElement element) {
 		PsiFile psiFile = element.getContainingFile();
 		if (psiFile instanceof PsiJavaFile javaFile) { // Check if it's a Java file
 			PsiPackageStatement packageStatement = javaFile.getPackageStatement();

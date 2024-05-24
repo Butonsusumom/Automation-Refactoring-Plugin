@@ -47,12 +47,12 @@ public class ReportDialog extends JDialog {
 	private JButton architectureSmellsBtn;
 	private JButton projectLevelSmellsBtn;
 	private JLabel titleLabel;
-	private ProjectSmellsInfo smellsInfo;
-	private final SmellTableService smellTableService = new SmellTableService();
-	private final MetricBarChartService barChartService = new MetricBarChartService();
-
-	private final MetricPieChartService pieChartService = new MetricPieChartService();
 	private final Color editorBackgroundColor;
+
+	MetricBarChartService barChartService = new MetricBarChartService();
+	MetricPieChartService pieChartService = new MetricPieChartService();
+	SmellTableService smellTableService =  new SmellTableService();
+	private final ProjectSmellsInfo smellsInfo;
 
 	public ReportDialog(ProjectSmellsInfo smellsInfo) {
 		this.smellsInfo = smellsInfo;
@@ -313,4 +313,38 @@ public class ReportDialog extends JDialog {
 		bottomRightPanel.setLayout(new BorderLayout());
 		bottomRightPanel.add(scrollPane, BorderLayout.CENTER);
 	}
+
+	// In ReportDialog.java
+	public JLabel getTitleLabel() {
+		return titleLabel;
+	}
+
+	public JPanel getLeftPanel() {
+		return leftPanel;
+	}
+
+	public JPanel getRightPanel() {
+		return rightPanel;
+	}
+
+	public JPanel getTopPanel() {
+		return topPanel;
+	}
+
+	public JPanel getBottomLeftPanel() {
+		return bottomLeftPanel;
+	}
+
+	public JPanel getBottomRightPanel() {
+		return bottomRightPanel;
+	}
+
+	public JPanel getChartPanel() {
+		return chartPanel;
+	}
+
+	public JPanel getBottomMostPanel() {
+		return bottomMostPanel;
+	}
+
 }

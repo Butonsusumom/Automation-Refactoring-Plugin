@@ -1,6 +1,7 @@
 package com.tsybulka.autorefactoringplugin.inspections;
 
 
+import com.intellij.codeInspection.InspectionToolProvider;
 import com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.MethodCyclomaticComplexityInspection;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonInspection;
 import com.tsybulka.autorefactoringplugin.inspections.longmethod.LongMethodInspection;
@@ -10,10 +11,11 @@ import com.tsybulka.autorefactoringplugin.inspections.repeatedobjectcreation.Rep
 import com.tsybulka.autorefactoringplugin.inspections.scatteredfunctionality.ScatteredFunctionalityInspection;
 import com.tsybulka.autorefactoringplugin.inspections.testmethodnaming.TestMethodNamingInspection;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import com.intellij.codeInspection.InspectionToolProvider;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class CodeInspectionProviderUnitTest {
