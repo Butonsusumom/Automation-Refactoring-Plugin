@@ -37,8 +37,7 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 		super.visitLocalVariable(variable);
 		if (variable.getInitializer() instanceof PsiLiteralExpression) {
 			constantValues.put(variable.getName(), variable.getInitializer().getText());
-		} else if (variable.getInitializer() instanceof PsiReferenceExpression) {
-			PsiReferenceExpression ref = (PsiReferenceExpression) variable.getInitializer();
+		} else if (variable.getInitializer() instanceof PsiReferenceExpression ref) {
 			if (constantValues.containsKey(ref.getReferenceName())) {
 				constantValues.put(variable.getName(), constantValues.get(ref.getReferenceName()));
 			}
@@ -86,8 +85,7 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 	public static String normalizeArgument(PsiExpression arg) {
 		if (arg instanceof PsiLiteralExpression) {
 			return arg.getText();
-		} else if (arg instanceof PsiReferenceExpression) {
-			PsiReferenceExpression ref = (PsiReferenceExpression) arg;
+		} else if (arg instanceof PsiReferenceExpression ref) {
 			String refName = ref.getReferenceName();
 			if (constantValues.containsKey(refName)) {
 				return constantValues.get(refName);
@@ -128,18 +126,16 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 		}
 	}
 
-	private boolean isAssignedToConstant(PsiNewExpression expression) {
+	boolean isAssignedToConstant(PsiNewExpression expression) {
 		PsiElement parent = expression.getParent();
 
 		// Check if the parent is a field declaration
-		if (parent instanceof PsiField) {
-			PsiField field = (PsiField) parent;
+		if (parent instanceof PsiField field) {
 			return field.hasModifierProperty(PsiModifier.FINAL) && field.hasInitializer();
 		}
 
 		// Check if the parent is a local variable declaration
-		if (parent instanceof PsiVariable) {
-			PsiVariable variable = (PsiVariable) parent;
+		if (parent instanceof PsiVariable variable) {
 			return variable.hasModifierProperty(PsiModifier.FINAL) && variable.hasInitializer();
 		}
 
@@ -160,10 +156,8 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 				// Check if any of the references are used in method call expressions
 				PsiElement element = reference.getElement();
 				// Check if the parent of the variable usage is a method call expression
-				if (element.getParent() instanceof PsiReferenceExpression) {
-					PsiReferenceExpression referenceExpression = (PsiReferenceExpression) element.getParent();
-					if (referenceExpression.getParent() instanceof PsiMethodCallExpression) {
-						PsiMethodCallExpression methodCall = (PsiMethodCallExpression) referenceExpression.getParent();
+				if (element.getParent() instanceof PsiReferenceExpression referenceExpression) {
+					if (referenceExpression.getParent() instanceof PsiMethodCallExpression methodCall) {
 						// Check if the method call is on the variable
 						if (methodCall.getMethodExpression().getQualifierExpression() == referenceExpression) {
 							return false;  // Method is called on the variable
@@ -190,11 +184,9 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 			}
 		} else if (parent instanceof PsiAssignmentExpression) {
 			PsiElement grandParent = parent.getParent();
-			if (grandParent instanceof PsiDeclarationStatement) {
-				PsiDeclarationStatement declaration = (PsiDeclarationStatement) grandParent;
+			if (grandParent instanceof PsiDeclarationStatement declaration) {
 				for (PsiElement element : declaration.getDeclaredElements()) {
-					if (element instanceof PsiLocalVariable) {
-						PsiLocalVariable variable = (PsiLocalVariable) element;
+					if (element instanceof PsiLocalVariable variable) {
 						if (variable.getInitializer() == newExpression) {
 							return variable;
 						}
@@ -207,8 +199,7 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 	}
 
 	private boolean isConstant(PsiElement element) {
-		if (element instanceof PsiField) {
-			PsiField field = (PsiField) element;
+		if (element instanceof PsiField field) {
 			return field.hasModifierProperty(PsiModifier.STATIC) && field.hasModifierProperty(PsiModifier.FINAL);
 		} else if (element instanceof PsiReferenceExpression) {
 			PsiElement resolved = ((PsiReferenceExpression) element).resolve();

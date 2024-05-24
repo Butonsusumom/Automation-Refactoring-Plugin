@@ -91,7 +91,7 @@ public class MetricsCalculationService {
 		return uniqueClassesCalled.size();
 	}
 
-	private int calculateLackOfCohesionInMethods(PsiClass psiClass) {
+	int calculateLackOfCohesionInMethods(PsiClass psiClass) {
 		// Simplified version: Count methods that do not share fields with other methods
 		// This is a very basic approximation
 		int sharedFields = 0;
@@ -110,22 +110,20 @@ public class MetricsCalculationService {
 		return totalMethodPairs - sharedFields; // Simplified LCOM
 	}
 
-	private boolean methodsShareField(PsiMethod method1, PsiMethod method2) {
+	boolean methodsShareField(PsiMethod method1, PsiMethod method2) {
 		Set<String> fields1 = extractFieldNames(method1);
 		Set<String> fields2 = extractFieldNames(method2);
 		fields1.retainAll(fields2); // Intersection of fields1 and fields2
 		return !fields1.isEmpty();
 	}
 
-	private Set<String> extractFieldNames(PsiMethod method) {
+	Set<String> extractFieldNames(PsiMethod method) {
 		final Set<String> fieldNames = new HashSet<>();
 		method.accept(new JavaRecursiveElementVisitor() {
 			@Override
 			public void visitReferenceExpression(PsiReferenceExpression expression) {
 				super.visitReferenceExpression(expression);
-				if (expression.resolve() instanceof PsiField) {
-					PsiField field = (PsiField) expression.resolve();
-					assert field != null;
+				if (expression.resolve() instanceof PsiField field) {
 					fieldNames.add(field.getName());
 				}
 			}
@@ -133,15 +131,15 @@ public class MetricsCalculationService {
 		return fieldNames;
 	}
 
-	private int calculateLinesOfCode(PsiClass psiClass) {
+	int calculateLinesOfCode(PsiClass psiClass) {
 		return (psiClass == null) ? 0 : StringUtil.countNewLines(psiClass.getText()) + 1;
 	}
 
-	private int calculateNumberOfFields(PsiClass psiClass) {
+	int calculateNumberOfFields(PsiClass psiClass) {
 		return psiClass.getFields().length;
 	}
 
-	private int calculateNumberOfPublicFields(PsiClass psiClass) {
+	int calculateNumberOfPublicFields(PsiClass psiClass) {
 		int count = 0;
 		for (PsiField field : psiClass.getFields()) {
 			if (field.hasModifierProperty(PsiModifier.PUBLIC)) {
@@ -151,11 +149,11 @@ public class MetricsCalculationService {
 		return count;
 	}
 
-	private int calculateNumberOfMethods(PsiClass psiClass) {
+	int calculateNumberOfMethods(PsiClass psiClass) {
 		return psiClass.getMethods().length;
 	}
 
-	private int calculateNumberOfPublicMethods(PsiClass psiClass) {
+	int calculateNumberOfPublicMethods(PsiClass psiClass) {
 		int count = 0;
 		for (PsiMethod method : psiClass.getMethods()) {
 			if (method.hasModifierProperty(PsiModifier.PUBLIC)) {
@@ -165,7 +163,7 @@ public class MetricsCalculationService {
 		return count;
 	}
 
-	private int calculateWmc(PsiClass psiClass) {
+	int calculateWmc(PsiClass psiClass) {
 		int wmc = 0;
 
 		// Include methods inherited from superclasses
@@ -188,12 +186,12 @@ public class MetricsCalculationService {
 		return wmc;
 	}
 
-	private int calculateNumberOfChildren(PsiClass psiClass, Project project) {
+	int calculateNumberOfChildren(PsiClass psiClass, Project project) {
 		// Use GlobalSearchScope.allScope(project) to search the entire project
 		Query<PsiClass> query = ClassInheritorsSearch.search(psiClass, GlobalSearchScope.allScope(project), true);
 		return query.findAll().size();
 	}
-	private int calculateDepthOfInheritanceTree(PsiClass psiClass) {
+	int calculateDepthOfInheritanceTree(PsiClass psiClass) {
 		int depth = 0;
 		PsiClass current = psiClass;
 		while (current != null) {
@@ -221,35 +219,40 @@ public class MetricsCalculationService {
 		return psiClasses;
 	}
 
-	private static void collectPsiClassesRecursively(PsiDirectory directory, Set<PsiClass> psiClasses) {
-		// Get all files in the directory
-		for (PsiFile psiFile : directory.getFiles()) {
-			// Check if the file is a Java file
-			if (psiFile instanceof PsiJavaFile) {
-				PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
-				// Get all classes from the Java file
-				Collections.addAll(psiClasses, psiJavaFile.getClasses());
+	public void collectPsiClassesRecursively(PsiDirectory directory, Set<PsiClass> psiClasses) {
+		// Ensure directory is not null
+		if (directory == null) {
+			return;
+		}
+
+		// Get files safely
+		PsiFile[] files = directory.getFiles();
+		for (PsiFile file : files) {
+			if (file instanceof PsiJavaFile javaFile) {
+				PsiClass[] classes = javaFile.getClasses();
+				Collections.addAll(psiClasses, classes);
 			}
 		}
 
-		// Recursively iterate through subdirectories
-		for (PsiDirectory subdirectory : directory.getSubdirectories()) {
+		// Process subdirectories safely
+		PsiDirectory[] subdirectories = directory.getSubdirectories();
+		for (PsiDirectory subdirectory : subdirectories) {
 			collectPsiClassesRecursively(subdirectory, psiClasses);
 		}
 	}
 
-	public static String getPackageName(PsiClass psiClass) {
+
+	String getPackageName(PsiClass psiClass) {
 		// Get the containing file of the PsiClass
 		PsiFile containingFile = psiClass.getContainingFile();
-		if (containingFile instanceof PsiJavaFile) {
+		if (containingFile instanceof PsiJavaFile javaFile) {
 			// Cast to PsiJavaFile to access the getPackageName method
-			PsiJavaFile javaFile = (PsiJavaFile) containingFile;
 			return javaFile.getPackageName();
 		}
 		return "";
 	}
 
-	static String getClassName(PsiClass psiClass) {
+	String getClassName(PsiClass psiClass) {
 		return psiClass.getName();
 	}
 

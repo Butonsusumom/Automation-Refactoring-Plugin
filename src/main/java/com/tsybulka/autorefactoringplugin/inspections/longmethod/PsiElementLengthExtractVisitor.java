@@ -12,7 +12,7 @@ public class PsiElementLengthExtractVisitor extends JavaRecursiveElementWalkingV
 
 	private boolean refactored = false;
 
-	private void extract(PsiElement element) {
+	void extract(PsiElement element) {
 		boolean shouldExtract = LongMethodDialogsProvider.showIdentifyComplexElementDialog(element.getProject(), element);
 		if (!shouldExtract) {
 			return;
@@ -27,7 +27,7 @@ public class PsiElementLengthExtractVisitor extends JavaRecursiveElementWalkingV
 		refactored = ExtractMethodHandler.invokeOnElements(element.getProject(), processor, element.getContainingFile(), true);
 	}
 
-	private void extractElementArray(PsiElement[] elements) {
+	void extractElementArray(PsiElement[] elements) {
 		PsiElement element = elements[0];
 		boolean shouldExtract = CyclomaticComplexityDialogsProvider.showIdentifyComplexElementsDialog(element.getProject(), elements);
 		if (!shouldExtract) {

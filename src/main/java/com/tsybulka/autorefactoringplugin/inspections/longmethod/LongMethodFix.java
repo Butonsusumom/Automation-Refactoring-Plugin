@@ -132,7 +132,7 @@ public class LongMethodFix implements LocalQuickFix {
 		paramClass.add(fullConstructor);
 	}
 
-	private void updateMethodBody(PsiMethod method, PsiParameter[] oldParameters, String newParameterName) {
+	void updateMethodBody(PsiMethod method, PsiParameter[] oldParameters, String newParameterName) {
 		PsiCodeBlock methodBody = method.getBody();
 		if (methodBody != null) {
 			// Create a map of parameter name replacements
@@ -145,9 +145,8 @@ public class LongMethodFix implements LocalQuickFix {
 		}
 	}
 
-	private void replaceVariableUsages(PsiElement element, Map<String, String> replacements) {
-		if (element instanceof PsiReferenceExpression) {
-			PsiReferenceExpression refExpr = (PsiReferenceExpression) element;
+	void replaceVariableUsages(PsiElement element, Map<String, String> replacements) {
+		if (element instanceof PsiReferenceExpression refExpr) {
 			String refName = refExpr.getReferenceName();
 			if (replacements.containsKey(refName)) {
 				PsiExpression newExpression = JavaPsiFacade.getElementFactory(element.getProject())
@@ -171,7 +170,7 @@ public class LongMethodFix implements LocalQuickFix {
 	 * @param className the class name to instantiate in the method call
 	 * @param factory   the PsiElementFactory for creating new PSI elements
 	 */
-	private void updateMethodCalls(PsiMethod method, String className, PsiElementFactory factory, Project project) {
+	void updateMethodCalls(PsiMethod method, String className, PsiElementFactory factory, Project project) {
 			ApplicationManager.getApplication().runReadAction(() -> {
 				// Search for all usages of the method in the project scope
 				Query<PsiReference> query = MethodReferencesSearch.search(method, GlobalSearchScope.projectScope(project), true);
@@ -221,7 +220,7 @@ public class LongMethodFix implements LocalQuickFix {
 		return false;
 	}
 
-	private boolean recursiveRefactor(PsiElement element, String type) {
+	boolean recursiveRefactor(PsiElement element, String type) {
 			int maxComplexity = 0;
 			PsiElement complexElement = null;
 			final int totalComplexity = getComplexity(element, type);
@@ -249,26 +248,19 @@ public class LongMethodFix implements LocalQuickFix {
 	}
 
 	private int getComplexity(PsiElement element, String type) {
-		int complexity = 1;
-		switch (type) {
-			case "loc":
-				complexity = getLinesOfCode(element);
-				break;
-			case "nestingDepth":
-				complexity = calculateNestingDepth(element);
-				break;
-		}
-		return complexity;
+		return switch (type) {
+			case "loc" -> getLinesOfCode(element);
+			case "nestingDepth" -> calculateNestingDepth(element);
+			default -> 1;
+		};
 	}
 
 	private PsiElement[] getChildren(PsiElement element) {
 		PsiElement[] childrenElement;
-		if (element instanceof PsiIfStatement) {
-			PsiIfStatement ifStatement = (PsiIfStatement) element;
+		if (element instanceof PsiIfStatement ifStatement) {
 			childrenElement = ArrayUtils.addAll(Objects.requireNonNull(ifStatement.getThenBranch()).getChildren(), Objects.requireNonNull(ifStatement.getElseBranch()).getChildren());
 			childrenElement = ArrayUtils.add(childrenElement, ifStatement.getCondition());
-		} else if (element instanceof PsiMethodCallExpression) {
-			PsiMethodCallExpression expression = (PsiMethodCallExpression) element;
+		} else if (element instanceof PsiMethodCallExpression expression) {
 			childrenElement = expression.getArgumentList().getExpressions();
 		} else {
 			childrenElement = element.getChildren();

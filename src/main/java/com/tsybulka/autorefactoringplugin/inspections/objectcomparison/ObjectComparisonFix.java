@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.IElementType;
 import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -16,13 +15,15 @@ import java.util.Objects;
  */
 public class ObjectComparisonFix implements LocalQuickFix {
 
-	private static final String FIX_MESSAGE =  InspectionsBundle.message("inspection.comparing.objects.references.use.quickfix");
-
-	@Nls
 	@NotNull
 	@Override
-	public String getFamilyName() {
-		return FIX_MESSAGE;
+	public String getName() {
+		return InspectionsBundle.message("inspection.comparing.objects.references.use.quickfix");
+	}
+
+	@Override
+	public @NotNull String getFamilyName() {
+		return getName();
 	}
 
 	@Override

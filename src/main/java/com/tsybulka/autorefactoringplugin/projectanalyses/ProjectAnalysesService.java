@@ -27,7 +27,11 @@ public class ProjectAnalysesService {
 
 	private static final String SCATTERED_FUNCTIONALITY_SMELL_NAME = InspectionsBundle.message("inspection.scattered.functionality.display.name");
 
-	private final MetricsCalculationService metricsCalculationService = new MetricsCalculationService();
+	private final MetricsCalculationService metricsCalculationService;
+
+	public ProjectAnalysesService(MetricsCalculationService metricsCalculationService) {
+		this.metricsCalculationService = metricsCalculationService;
+	}
 
 	public ProjectSmellsInfo analyseProject(Project project) {
 		List<ClassMetrics> projectClassMetrics = metricsCalculationService.calculateProjectMetrics(project);
@@ -124,10 +128,9 @@ public class ProjectAnalysesService {
 		}
 	}
 
-	private String getPackageName(PsiElement element) {
+	String getPackageName(PsiElement element) {
 		PsiFile psiFile = element.getContainingFile();
-		if (psiFile instanceof PsiJavaFile) { // Check if it's a Java file
-			PsiJavaFile javaFile = (PsiJavaFile) psiFile;
+		if (psiFile instanceof PsiJavaFile javaFile) { // Check if it's a Java file
 			PsiPackageStatement packageStatement = javaFile.getPackageStatement();
 			if (packageStatement != null) {
 				return packageStatement.getPackageName();

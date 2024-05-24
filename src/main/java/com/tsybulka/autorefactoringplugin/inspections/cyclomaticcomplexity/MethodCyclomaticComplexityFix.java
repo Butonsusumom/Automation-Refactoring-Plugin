@@ -42,7 +42,7 @@ public class MethodCyclomaticComplexityFix implements LocalQuickFix {
 		});
 	}
 
-	private boolean refactor(PsiElement element) {
+	boolean refactor(PsiElement element) {
 		int maxComplexity = 1;
 		PsiElement complexElement = null;
 		final int totalComplexity = getComplexity(element);
@@ -69,23 +69,21 @@ public class MethodCyclomaticComplexityFix implements LocalQuickFix {
 		}
 	}
 
-	private int getComplexity(PsiElement element) {
+	int getComplexity(PsiElement element) {
 		CyclomaticComplexityVisitor visitor = new CyclomaticComplexityVisitor();
 		element.accept(visitor);
 		return visitor.getComplexity();
 	}
 
-	private PsiElement[] getChildren(PsiElement element) {
+	PsiElement[] getChildren(PsiElement element) {
 		PsiElement[] childrenElement;
-		if (element instanceof PsiIfStatement) {
-			PsiIfStatement ifStatement = (PsiIfStatement) element;
+		if (element instanceof PsiIfStatement ifStatement) {
 			childrenElement = ArrayUtils.addAll(
 					Objects.requireNonNull(ifStatement.getThenBranch()).getChildren(),
 					Objects.requireNonNull(ifStatement.getElseBranch()).getChildren()
 			);
 			childrenElement = ArrayUtils.add(childrenElement, ifStatement.getCondition());
-		} else if (element instanceof PsiMethodCallExpression) {
-			PsiMethodCallExpression expression = (PsiMethodCallExpression) element;
+		} else if (element instanceof PsiMethodCallExpression expression) {
 			childrenElement = expression.getArgumentList().getExpressions();
 		} else {
 			childrenElement = element.getChildren();

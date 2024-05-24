@@ -3,6 +3,7 @@ package com.tsybulka.autorefactoringplugin.actions;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.tsybulka.autorefactoringplugin.model.smell.ProjectSmellsInfo;
+import com.tsybulka.autorefactoringplugin.projectanalyses.MetricsCalculationService;
 import com.tsybulka.autorefactoringplugin.projectanalyses.ProjectAnalysesService;
 import com.tsybulka.autorefactoringplugin.ui.ReportDialog;
 
@@ -19,7 +20,7 @@ public class AnalyzeCodeAction extends AnAction {
 
 	private static final Logger LOGGER = Logger.getLogger(AnalyzeCodeAction.class.getName());
 
-	private final ProjectAnalysesService projectAnalysesService = new ProjectAnalysesService();
+	private final ProjectAnalysesService projectAnalysesService = new ProjectAnalysesService(new MetricsCalculationService());
 
 	@Override
 	public void actionPerformed(AnActionEvent event) {
