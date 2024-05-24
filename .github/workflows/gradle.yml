@@ -89,7 +89,6 @@ jobs:
 
   dependency-submission:
 
-    needs: qodana
     runs-on: ubuntu-latest
     permissions:
       contents: write
