@@ -29,29 +29,33 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 
 	@Override
 	public boolean isInspectionEnabled() {
-		return settings.isScatteredFunctionalityCheck();
+		return settings.isRecurringObjectCreationCheck();
 	}
 
 	@Override
 	public void visitLocalVariable(PsiLocalVariable variable) {
-		super.visitLocalVariable(variable);
-		if (variable.getInitializer() instanceof PsiLiteralExpression) {
-			constantValues.put(variable.getName(), variable.getInitializer().getText());
-		} else if (variable.getInitializer() instanceof PsiReferenceExpression) {
-			PsiReferenceExpression ref = (PsiReferenceExpression) variable.getInitializer();
-			if (constantValues.containsKey(ref.getReferenceName())) {
-				constantValues.put(variable.getName(), constantValues.get(ref.getReferenceName()));
+		if (isInspectionEnabled()) {
+			super.visitLocalVariable(variable);
+			if (variable.getInitializer() instanceof PsiLiteralExpression) {
+				constantValues.put(variable.getName(), variable.getInitializer().getText());
+			} else if (variable.getInitializer() instanceof PsiReferenceExpression) {
+				PsiReferenceExpression ref = (PsiReferenceExpression) variable.getInitializer();
+				if (constantValues.containsKey(ref.getReferenceName())) {
+					constantValues.put(variable.getName(), constantValues.get(ref.getReferenceName()));
+				}
 			}
 		}
 	}
 
 	@Override
 	public void visitNewExpression(PsiNewExpression expression) {
-		super.visitNewExpression(expression);
-		if (!isEmptyConstructor(expression)) {
-			String objectKey = createObjectKey(expression);
-			if (objectKey != null) {
-				objectInstances.computeIfAbsent(objectKey, k -> new ArrayList<>()).add(expression);
+		if (isInspectionEnabled()) {
+			super.visitNewExpression(expression);
+			if (!isEmptyConstructor(expression)) {
+				String objectKey = createObjectKey(expression);
+				if (objectKey != null) {
+					objectInstances.computeIfAbsent(objectKey, k -> new ArrayList<>()).add(expression);
+				}
 			}
 		}
 	}
@@ -70,17 +74,20 @@ public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
 		if (classReference == null) return null;
 
 		String className = classReference.getQualifiedName();
-		PsiExpression[] args = Objects.requireNonNull(expression.getArgumentList()).getExpressions();
-		StringBuilder keyBuilder = new StringBuilder(className).append("(");
+		if (expression.getArgumentList()!=null) {
+			PsiExpression[] args = expression.getArgumentList().getExpressions();
+			StringBuilder keyBuilder = new StringBuilder(className).append("(");
 
-		for (PsiExpression arg : args) {
-			keyBuilder.append(normalizeArgument(arg)).append(", ");
+			for (PsiExpression arg : args) {
+				keyBuilder.append(normalizeArgument(arg)).append(", ");
+			}
+			if (args.length > 0) {
+				keyBuilder.setLength(keyBuilder.length() - 2); // Remove the last comma and space
+			}
+			keyBuilder.append(")");
+			return keyBuilder.toString();
 		}
-		if (args.length > 0) {
-			keyBuilder.setLength(keyBuilder.length() - 2); // Remove the last comma and space
-		}
-		keyBuilder.append(")");
-		return keyBuilder.toString();
+		return null;
 	}
 
 	public static String normalizeArgument(PsiExpression arg) {

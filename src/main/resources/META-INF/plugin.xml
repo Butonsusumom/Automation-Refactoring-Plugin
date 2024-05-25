@@ -5,7 +5,7 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>AutoRefactoringPlugin</name>
+    <name>AutoRefactor</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="tsubulko.ksenia@gmail.com">Ksenia Tsybulka</vendor>
@@ -15,10 +15,33 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description>
         <![CDATA[
-      AutoRefactor automatically analyzes your codebase and suggests comprehensive refactoring solutions to enhance readability, maintainability, and performance.<br>
-      Say goodbye to tedious manual refactoring tasks and let AutoRefactor optimize your code effortlessly.
+    <div style="font-family: Arial, sans-serif; color: #333;">
+        <p><strong>AutoRefactor</strong> automatically analyzes your codebase and suggests comprehensive refactoring solutions to enhance readability, maintainability, and performance. Say goodbye to tedious manual refactoring tasks and let <strong>AutoRefactor</strong> optimize your code effortlessly.</p>
+
+        <h3><strong>Getting Started Quickly:</strong></h3>
+        <ul>
+            <li>Open your project and navigate to <strong>Tools &gt; Analyze Project</strong> for an overview of code smells.</li>
+            <li>Use the intuitive dashboard to manage settings and initiate refactoring operations effortlessly.</li>
+        </ul>
+
+        <h3><strong>Configuring Your Experience:</strong></h3>
+        <ul>
+            <li>Customize the plugin’s settings via <strong>File &gt; Settings &gt; AutoRefactor Plugin Settings</strong>.</li>
+            <li>Set thresholds for code smell detection and choose specific refactoring rules to meet your project’s needs.</li>
+        </ul>
+
+        <h3><strong>Run Code Inspections with Ease:</strong></h3>
+        <ul>
+            <li>Simply right-click on any Java file or project in the Project Explorer.</li>
+            <li>Choose <strong>Refactor &gt; Detect and Refactor Code Smells</strong>.</li>
+            <li>Review the suggested refactorings and apply them at your convenience.</li>
+        </ul>
+
+        <p>For more detailed information and to access the full documentation, visit the <a href="https://butonsusumom.github.io/Automation-Refactoring-Plugin/" target="_blank">Automated Refactoring Plugin Documentation</a>.</p>
+    </div>
     ]]>
     </description>
+
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->

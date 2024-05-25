@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.tsybulka"
-version = "1.0-SNAPSHOT"
+version = "2.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -56,8 +56,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("222")
-        untilBuild.set("232.*")
+        sinceBuild.set("221")
+        untilBuild.set("242.*")
     }
 
     signPlugin {
