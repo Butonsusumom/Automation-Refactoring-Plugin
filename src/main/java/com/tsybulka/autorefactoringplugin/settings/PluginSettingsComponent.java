@@ -37,7 +37,7 @@ public class PluginSettingsComponent {
 	@NotNull
 	private JTextField testMethodNamingRegexField = new JBTextField();
 	@NotNull
-	private JLabel errorCyclomaticComplexityLabel = new JBLabel("<html>Methods with cyclomatic complexity over 20 are viewed as complex, potentially impacting maintainability.<br/> Please reduce maximum allowed cyclomatic complexity.</html>");
+	private JLabel errorCyclomaticComplexityLabel = new JBLabel("<html>Cyclomatic complexity should be between 1 and 20. Methods with cyclomatic complexity over 20 are viewed as complex, potentially impacting maintainability.<br/> Please reduce maximum allowed cyclomatic complexity.</html>");
 	@NotNull
 	private JLabel exampleTestMethodNamingLabel = new JBLabel("<html>Example: should.*_when.*_given.*</html>");
 	@NotNull

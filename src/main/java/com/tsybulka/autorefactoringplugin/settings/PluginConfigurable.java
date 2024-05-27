@@ -78,10 +78,11 @@ public class PluginConfigurable implements Configurable {
 	}
 
 	private boolean isCyclomaticComplexityValid(PluginSettingsComponent settings) {
-		return Integer.parseInt(settings.getCyclomaticComplexityNumericalField().getText()) <= 20;
+		return !settings.getCyclomaticComplexityNumericalField().getText().isEmpty() && Integer.parseInt(settings.getCyclomaticComplexityNumericalField().getText()) <= 20;
 	}
 
 	private boolean isRegExpValid(PluginSettingsComponent settings) {
+		if (settings.getTestMethodNamingRegexField().getText().isEmpty()) return false;
 		try {
 			Pattern.compile(settings.getTestMethodNamingRegexField().getText());
 			return true;  // No exception thrown, so the regex is valid

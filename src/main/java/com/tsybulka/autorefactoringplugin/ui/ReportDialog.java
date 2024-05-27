@@ -58,7 +58,7 @@ public class ReportDialog extends JDialog {
 		this.smellsInfo = smellsInfo;
 
 		setModal(true);
-		setResizable(false);
+		setResizable(true);
 		setTitle(REPORT_DIALOGUE_TITLE);
 		getContentPane().setLayout(new BorderLayout());
 		JPanel contentPanel = new JPanel();
