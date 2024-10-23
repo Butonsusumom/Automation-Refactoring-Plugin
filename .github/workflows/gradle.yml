@@ -3,6 +3,7 @@ name: Java CI for IntelliJ Plugin
 on:
   pull_request:
   push:
+        - '**'
   branches:
         - '**'
 
