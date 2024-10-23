@@ -1,11 +1,12 @@
 name: Java CI for IntelliJ Plugin
 
 on:
+  push:  # Run pipeline on push to any branch
+    branches:
+      - '**'  # '**' matches all branches
   pull_request:
-  push:
-        - '**'
-  branches:
-        - '**'
+    branches:
+      - '**'  # Also run pipeline on any pull request to any branch
 
 jobs:
   build:
