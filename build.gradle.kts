@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.11.2"
+    id("org.jetbrains.intellij") version "1.17.2"
 }
 
 group = "com.tsybulka"
@@ -45,10 +45,10 @@ intellij {
 }
 
 tasks {
-    // Ensure compatibility with Java 17
+    // Ensure compatibility with Java 8
     withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        sourceCompatibility = "8"
+        targetCompatibility = "8"
     }
 
     test {
