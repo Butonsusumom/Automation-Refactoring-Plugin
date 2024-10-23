@@ -11,7 +11,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.MethodReferencesSearch;
 import com.intellij.util.Query;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.inspections.longmethod.attributes.LengthyMetrics;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nls;

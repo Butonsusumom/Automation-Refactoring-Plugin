@@ -3,14 +3,14 @@ package com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.siyeh.ig.classmetrics.CyclomaticComplexityVisitor;
-import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
 
 import java.util.List;
 
-public class MethodCyclomaticComplexityVisitor extends CodeInspectionVisitor {
+public class MethodCyclomaticComplexityVisitor extends BaseCodeInspectionVisitor {
 
 	private static final String NAME = InspectionsBundle.message("inspection.cyclomatic.complexity.display.name");
 

@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

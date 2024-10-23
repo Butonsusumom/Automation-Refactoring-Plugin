@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.projectanalyses.MetricsCalculationService;
 import org.jetbrains.annotations.NotNull;

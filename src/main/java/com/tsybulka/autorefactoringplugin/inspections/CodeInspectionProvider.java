@@ -1,38 +1,41 @@
 package com.tsybulka.autorefactoringplugin.inspections;
 
 import com.intellij.codeInspection.InspectionToolProvider;
-import com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.MethodCyclomaticComplexityInspection;
-import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonInspection;
-import com.tsybulka.autorefactoringplugin.inspections.longmethod.LongMethodInspection;
-import com.tsybulka.autorefactoringplugin.inspections.objectcomparison.ObjectComparisonInspection;
-import com.tsybulka.autorefactoringplugin.inspections.objectparameter.ObjectMethodParameterInspection;
-import com.tsybulka.autorefactoringplugin.inspections.repeatedobjectcreation.RepeatedObjectCreationInspection;
-import com.tsybulka.autorefactoringplugin.inspections.scatteredfunctionality.ScatteredFunctionalityInspection;
-import com.tsybulka.autorefactoringplugin.inspections.testmethodnaming.TestMethodNamingInspection;
-import org.jetbrains.annotations.NotNull;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ConfigurationBuilder;
+
+import java.util.Set;
 
 /**
- * Collects all implemented inspections
+ * Provides a mechanism to dynamically retrieve custom inspection classes
+ * for the code inspection framework in a plugin.
+ * <p>
+ * This class implements the {@link InspectionToolProvider} interface,
+ * allowing it to scan for all subclasses of {@link BaseCodeInspection}
+ * within the specified package.
+ * </p>
  */
 public class CodeInspectionProvider implements InspectionToolProvider {
 
-	@NotNull
+	/**
+	 * Returns an array of classes that extend {@link BaseCodeInspection}.
+	 * This method uses the Reflections library to dynamically scan the specified package
+	 * for inspection classes at runtime.
+	 *
+	 * @return An array of classes that extend {@link BaseCodeInspection}.
+	 */
 	@Override
 	public Class[] getInspectionClasses() {
-		return new Class[] {
-				// Architecture
-				ScatteredFunctionalityInspection.class,
+		ClassLoader classLoader = this.getClass().getClassLoader();
 
-				// Implementation
-				RepeatedObjectCreationInspection.class,
-				ObjectComparisonInspection.class,
-				EnumComparisonInspection.class,
-				ObjectMethodParameterInspection.class,
-				MethodCyclomaticComplexityInspection.class,
-				LongMethodInspection.class,
-
-				// Test
-				TestMethodNamingInspection.class
-		};
+		Reflections reflections = new Reflections(
+				new ConfigurationBuilder()
+						.addClassLoader(classLoader)
+						.forPackages("com.tsybulka")
+						.addScanners(new SubTypesScanner(false))
+		);
+		Set<Class<? extends BaseCodeInspection>> classes = reflections.getSubTypesOf(BaseCodeInspection.class);
+		return classes.toArray(new Class[0]);
 	}
 }

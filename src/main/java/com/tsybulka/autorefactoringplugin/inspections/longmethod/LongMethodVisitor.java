@@ -2,15 +2,15 @@ package com.tsybulka.autorefactoringplugin.inspections.longmethod;
 
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.inspections.longmethod.attributes.LengthyMetrics;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
 
 import java.util.List;
 
-public class LongMethodVisitor extends CodeInspectionVisitor {
+public class LongMethodVisitor extends BaseCodeInspectionVisitor {
 
 	private static final String NAME = InspectionsBundle.message("inspection.long.method.display.name");
 
