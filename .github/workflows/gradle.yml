@@ -1,16 +1,15 @@
 name: Java CI for IntelliJ Plugin
 
 on:
-  push:  # Run pipeline on push to any branch
+  push:
     branches:
-      - '**'  # '**' matches all branches
+      - '**'
   pull_request:
     branches:
-      - '**'  # Also run pipeline on any pull request to any branch
+      - '**'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +53,7 @@ jobs:
 
       # Step 8: Package the plugin
       - name: Build plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin --no-daemon
 
       # Step 9: Upload build artifacts (optional)
       - name: Upload plugin artifact
