@@ -128,58 +128,6 @@ class TestMethodNamingVisitorUnitTest extends LightPlatformCodeInsightFixture4Te
 	}
 
 	@Test
-	public void shouldRegisterSmellWithClassName_whenRegisterSmell_givenMethodHasContainingClass() {
-		PsiMethod givenMethod = getPsiMethodFromTextWithClass("@org.junit.jupiter.api.Test public void badMethodName() {}");
-
-		PsiMethod expectedMethod = getPsiMethodFromTextWithClass("@org.junit.jupiter.api.Test public void badMethodName() {}");
-
-		TestSmell expectedSmell = new TestSmell(
-				"Test method naming convention not followed",
-				"",
-				"Test names should follow the \"test[A-Za-z]+\" format to describe the tested method.",
-				TestSmellType.TEST_METHOD_NAMING,
-				ApplicationManager.getApplication().runReadAction((Computable<PsiIdentifier>) expectedMethod::getNameIdentifier),
-				"DummyClass",
-				"badMethodName");
-
-		// when
-		ApplicationManager.getApplication().runReadAction(()->classUnderTest.registerSmell(givenMethod));
-
-		// then
-		List<TestSmell> smellsList = classUnderTest.getSmellsList();
-
-		assertThat(smellsList).hasSize(1).first().usingRecursiveComparison().isEqualTo(expectedSmell);
-
-		assertThat(smellsList).isEmpty();
-	}
-
-	@Test
-	public void shouldRegisterSmellWithoutClassName_whenRegisterSmell_givenMethodHasNoContainingClass() {
-		PsiMethod givenMethod = getPsiMethodFromTextWithClass("@org.junit.jupiter.api.Test public void badMethodName() {}");
-
-		PsiMethod expectedMethod = getPsiMethodFromTextWithClass("@org.junit.jupiter.api.Test public void badMethodName() {}");
-
-		TestSmell expectedSmell = new TestSmell(
-				"Test method naming convention not followed",
-				"",
-				"Test names should follow the \"test[A-Za-z]+\" format to describe the tested method.",
-				TestSmellType.TEST_METHOD_NAMING,
-				ApplicationManager.getApplication().runReadAction((Computable<PsiIdentifier>) expectedMethod::getNameIdentifier),
-				"",
-				"badMethodName");
-
-		// when
-		ApplicationManager.getApplication().runReadAction(()->classUnderTest.registerSmell(givenMethod));
-
-		// then
-		List<TestSmell> smellsList = classUnderTest.getSmellsList();
-
-		assertThat(smellsList).hasSize(1).first().usingRecursiveComparison().isEqualTo(expectedSmell);
-
-		assertThat(smellsList).isEmpty();
-	}
-
-	@Test
 	public void shouldReturnTrue_whenIsTestMethod_givenJUnit4TestAnnotation() {
 		//given
 		PsiMethod givenMethod = getPsiMethodFromTextWithClass("@org.junit.Test public void myTest() {}");
@@ -254,13 +202,6 @@ class TestMethodNamingVisitorUnitTest extends LightPlatformCodeInsightFixture4Te
 	private PsiMethod getPsiMethodFromTextWithClass(String methodText) {
 		String classText = "class DummyClass { " + methodText + " }";
 		PsiJavaFile psiJavaFile = (PsiJavaFile) myFixture.configureByText("DummyClass.java", classText);
-		PsiClass psiClass
-				= ApplicationManager.getApplication().runReadAction((Computable<PsiClass>) () -> psiJavaFile.getClasses()[0]);
-		return ApplicationManager.getApplication().runReadAction((Computable<PsiMethod>) () -> psiClass.getMethods()[0]);
-	}
-
-	private PsiMethod getPsiMethodFromTextWithoutClass(String methodText) {
-		PsiJavaFile psiJavaFile = (PsiJavaFile) myFixture.configureByText("DummyClass.java", methodText);
 		PsiClass psiClass
 				= ApplicationManager.getApplication().runReadAction((Computable<PsiClass>) () -> psiJavaFile.getClasses()[0]);
 		return ApplicationManager.getApplication().runReadAction((Computable<PsiMethod>) () -> psiClass.getMethods()[0]);

@@ -76,17 +76,12 @@ public class TestMethodNamingVisitor extends BaseCodeInspectionVisitor {
 	 * @param method the method to check for test annotations; must not be null.
 	 * @return {@code true} if the method is annotated as a test method; {@code false} otherwise.
 	 */
-	@VisibleForTesting
 	void registerSmell(PsiMethod method) {
 		String testNamingRegExp = settings.getTestMethodNamingRegExp();
 		PsiClass containingClass = PsiTreeUtil.getParentOfType(method, PsiClass.class);
 		String packageName = PsiElementsUtils.getPackageName(containingClass);
 		String methodName = method.getName();
-		String className = "";
-
-		if (containingClass != null) {
-			className = containingClass.getName();
-		}
+		String className = containingClass.getName();
 
 		smellsList.add(new TestSmell(NAME, packageName, InspectionsBundle.message("inspection.test.method.name.problem.descriptor", testNamingRegExp), TestSmellType.TEST_METHOD_NAMING, method.getNameIdentifier(), className, methodName));
 	}

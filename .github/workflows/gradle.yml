@@ -45,15 +45,15 @@ jobs:
 
       # Step 6: Build the project
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: ./gradlew build
 
       # Step 7: Run tests
       - name: Run tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew test
 
       # Step 8: Package the plugin
       - name: Build plugin
-        run: ./gradlew buildPlugin --no-daemon
+        run: ./gradlew buildPlugin
 
       # Step 9: Upload build artifacts (optional)
       - name: Upload plugin artifact

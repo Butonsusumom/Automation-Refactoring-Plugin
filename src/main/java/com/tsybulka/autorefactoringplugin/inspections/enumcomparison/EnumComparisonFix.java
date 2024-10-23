@@ -16,7 +16,7 @@ import java.util.Objects;
  */
 public class EnumComparisonFix extends BaseCodeInspectionQuickFix {
 
-	private static final String FIX_MESSAGE =  InspectionsBundle.message("inspection.comparing.enums.references.use.quickfix");
+	private static final String FIX_MESSAGE = InspectionsBundle.message("inspection.comparing.enums.references.use.quickfix");
 
 	@Nls
 	@NotNull
@@ -28,7 +28,7 @@ public class EnumComparisonFix extends BaseCodeInspectionQuickFix {
 	/**
 	 * Applies the fix by replacing improper enum comparisons with the correct usage.
 	 *
-	 * @param project          The current project context.
+	 * @param project           The current project context.
 	 * @param problemDescriptor The descriptor for the detected problem.
 	 */
 	@Override
@@ -82,9 +82,9 @@ public class EnumComparisonFix extends BaseCodeInspectionQuickFix {
 	/**
 	 * Creates a binary expression for the equality check.
 	 *
-	 * @param project   The current project context.
-	 * @param lOperand  The left operand expression.
-	 * @param rOperand  The right operand expression.
+	 * @param project  The current project context.
+	 * @param lOperand The left operand expression.
+	 * @param rOperand The right operand expression.
 	 */
 	private PsiBinaryExpression createEqualsExpression(@NotNull Project project, PsiExpression lOperand, PsiExpression rOperand) {
 		PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
@@ -108,8 +108,8 @@ public class EnumComparisonFix extends BaseCodeInspectionQuickFix {
 	private boolean isNegationRequired(PsiExpression lOperand) {
 		PsiElement parent = lOperand.getParent();
 
-		if (parent instanceof PsiPrefixExpression prefixExpression) {
-			PsiJavaToken operationToken = prefixExpression.getOperationSign();
+		if (parent instanceof PsiPrefixExpression) {
+			PsiJavaToken operationToken = ((PsiPrefixExpression) parent).getOperationSign();
 			return operationToken.getTokenType() == JavaTokenType.EXCL;
 		}
 		return false;
