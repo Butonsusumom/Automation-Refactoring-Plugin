@@ -36,23 +36,27 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}
 
-      # Step 4: Validate Gradle Wrapper
+      # Step 4: Set execute permission for Gradle wrapper
+      - name: Set execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+
+      # Step 5: Validate Gradle Wrapper
       - name: Validate Gradle Wrapper
         run: ./gradlew wrapper --gradle-version
 
-      # Step 5: Build the project
+      # Step 6: Build the project
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
-      # Step 6: Run tests
+      # Step 7: Run tests
       - name: Run tests
         run: ./gradlew test --no-daemon
 
-      # Step 7: Package the plugin
+      # Step 8: Package the plugin
       - name: Build plugin
         run: ./gradlew buildPlugin
 
-      # Step 8: Upload build artifacts (optional)
+      # Step 9: Upload build artifacts (optional)
       - name: Upload plugin artifact
         uses: actions/upload-artifact@v3
         with:
