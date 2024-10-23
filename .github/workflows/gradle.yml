@@ -40,9 +40,9 @@ jobs:
       - name: Set execute permission for Gradle wrapper
         run: chmod +x ./gradlew
 
-      # Step 5: Validate Gradle Wrapper
+      # Step 5: Validate and update Gradle Wrapper
       - name: Validate Gradle Wrapper
-        run: ./gradlew wrapper --gradle-version
+        run: ./gradlew wrapper --gradle-version 8.1.1  # Specify the desired Gradle version here
 
       # Step 6: Build the project
       - name: Build with Gradle
