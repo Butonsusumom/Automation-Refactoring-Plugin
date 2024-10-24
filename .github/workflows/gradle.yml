@@ -1,10 +1,9 @@
 name: Java CI for IntelliJ Plugin
 
 on:
-  push:
-    branches:
-      - '**'
+  workflow_dispatch:
   pull_request:
+  push:
     branches:
       - '**'
 
