@@ -3,86 +3,120 @@ package com.tsybulka.autorefactoringplugin.inspections.objectcomparison;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
-import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.util.PsiElementsUtils;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
+import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectComparisonVisitor extends CodeInspectionVisitor {
+/**
+ * Visitor for inspecting binary expressions that compare object references.
+ * This visitor identifies implementation smells related to object reference comparisons,
+ * specifically when using the equality (==) or inequality (!=) operators for objects.
+ *
+ * @see BaseCodeInspectionVisitor
+ */
+@Getter
+public class ObjectComparisonVisitor extends BaseCodeInspectionVisitor{
 
 	private static final String DESCRIPTION = InspectionsBundle.message("inspection.comparing.objects.references.problem.descriptor");
 	private static final String NAME = InspectionsBundle.message("inspection.comparing.objects.references.display.name");
 
-	private List<ImplementationSmell> implementationSmellsList;
-
-	public ObjectComparisonVisitor(List<ImplementationSmell> implementationSmellsList) {
-		this.implementationSmellsList = implementationSmellsList;
-	}
+	private List<ImplementationSmell> smellsList = new ArrayList<>();
 
 	@Override
 	public boolean isInspectionEnabled() {
 		return settings.isObjectComparisonCheck();
 	}
 
+	/**
+	 * Visits a binary expression and checks for object reference comparisons.
+	 * If an object comparison is detected using equality (==) or inequality (!=),
+	 * it registers an implementation smell.
+	 *
+	 * @param expression the binary expression being visited.
+	 */
 	@Override
 	public void visitBinaryExpression(PsiBinaryExpression expression) {
 		if (isInspectionEnabled()) {
 			super.visitBinaryExpression(expression);
-			IElementType opSign = expression.getOperationTokenType();
-			if (opSign == JavaTokenType.EQEQ || opSign == JavaTokenType.NE) {
-				PsiExpression lOperand = expression.getLOperand();
-				PsiExpression rOperand = expression.getROperand();
-				if (rOperand == null || isNullLiteral(lOperand) || isNullLiteral(rOperand)) return;
+			checkForObjectComparison(expression);
+		}
+	}
 
-				PsiType lType = lOperand.getType();
-				PsiType rType = rOperand.getType();
+	/**
+	 * Checks if the given binary expression uses equality or inequality operators
+	 * and registers an implementation smell if it compares object references.
+	 *
+	 * @param expression the binary expression to check.
+	 */
+	private void checkForObjectComparison(PsiBinaryExpression expression) {
+		IElementType operator = expression.getOperationTokenType();
 
-				if ((isObject(lType) && isNotEnum(lType)) || (isObject(rType) && isNotEnum(rType))) {
+		if (isComparisonOperator(operator)) {
+			PsiExpression leftOperand = expression.getLOperand();
+			PsiExpression rightOperand = expression.getROperand();
+
+			if (isValidOperands(leftOperand, rightOperand)) {
+				PsiType leftType = leftOperand.getType();
+				PsiType rightType = rightOperand.getType();
+
+				if (PsiElementsUtils.isObjectType(leftType) || PsiElementsUtils.isObjectType(rightType)) {
 					registerSmell(expression);
 				}
 			}
 		}
 	}
 
-	private static boolean isNullLiteral(PsiExpression expr) {
-		return expr instanceof PsiLiteralExpression && "null".equals(expr.getText());
+	/**
+	 * Checks if the provided IElementType is an equality (==) or inequality (!=) operator.
+	 *
+	 * @param operator the operator to check.
+	 * @return true if the operator is == or !=; false otherwise.
+	 */
+	private boolean isComparisonOperator(IElementType operator) {
+		return operator == JavaTokenType.EQEQ || operator == JavaTokenType.NE;
 	}
 
-	private boolean isObject(PsiType type) {
-		return type instanceof PsiClassType;
+	/**
+	 * Validates if the left and right operands are suitable for comparison.
+	 *
+	 * @param leftOperand  the left operand of the expression.
+	 * @param rightOperand the right operand of the expression.
+	 */
+	private boolean isValidOperands(PsiExpression leftOperand, PsiExpression rightOperand) {
+		return rightOperand != null && !isNullLiteral(leftOperand) && !isNullLiteral(rightOperand);
 	}
 
-	private boolean isNotEnum(PsiType type) {
-		PsiClass psiClass = PsiUtil.resolveClassInType(type);
-		return psiClass == null || !psiClass.isEnum();
+	private boolean isNullLiteral(PsiExpression expression) {
+		return expression instanceof PsiLiteralExpression && "null".equals(expression.getText());
 	}
 
-	void registerSmell(PsiExpression expression) {
-		// Find the containing class of the expression
+	/**
+	 * Registers an implementation smell when an object comparison is detected.
+	 * It gathers information about the containing class and method and adds
+	 * an instance of ImplementationSmell to the provided list.
+	 *
+	 * @param expression the expression that triggered the smell registration.
+	 */
+	private void registerSmell(PsiExpression expression) {
 		PsiClass containingClass = PsiTreeUtil.getParentOfType(expression, PsiClass.class);
-		String className = "";
-		String packageName = "";
-		String methodName = "";
+		String className = containingClass != null ? containingClass.getName() : "";
+		String packageName = PsiElementsUtils.getPackageName(containingClass);
+		String methodName = PsiElementsUtils.getContainingMethodName(expression);
 
-		if (containingClass != null) {
-			className = containingClass.getName();
-			// Find the package name of the class
-			PsiFile containingFile = containingClass.getContainingFile();
-			if (containingFile instanceof PsiJavaFile) {
-				packageName = ((PsiJavaFile) containingFile).getPackageName();
-			}
-		}
-		// Find the method name that contains the expression
-		PsiMethod containingMethod = PsiTreeUtil.getParentOfType(expression, PsiMethod.class);
-		if (containingMethod != null) {
-			methodName = containingMethod.getName();
-		}
-
-		implementationSmellsList.add(
-				new ImplementationSmell(NAME, packageName, DESCRIPTION, ImplementationSmellType.REFERENCE_COMPARISON_INSTEAD_OF_CONTENT, expression, className, methodName));
-
+		smellsList.add(new ImplementationSmell(
+				NAME,
+				packageName,
+				DESCRIPTION,
+				ImplementationSmellType.REFERENCE_COMPARISON_INSTEAD_OF_CONTENT,
+				expression,
+				className,
+				methodName
+		));
 	}
 }

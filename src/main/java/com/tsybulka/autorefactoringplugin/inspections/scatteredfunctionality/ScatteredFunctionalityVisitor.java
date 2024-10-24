@@ -2,11 +2,11 @@ package com.tsybulka.autorefactoringplugin.inspections.scatteredfunctionality;
 
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
 
 import java.util.*;
 
-public class ScatteredFunctionalityVisitor extends CodeInspectionVisitor {
+public class ScatteredFunctionalityVisitor extends BaseCodeInspectionVisitor {
 
 	private static final String REPLACEMENT_VARIABLE_NAME = "var";
 

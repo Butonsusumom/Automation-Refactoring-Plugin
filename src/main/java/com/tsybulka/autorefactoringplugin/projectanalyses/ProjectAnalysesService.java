@@ -3,7 +3,7 @@ package com.tsybulka.autorefactoringplugin.projectanalyses;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.inspections.cyclomaticcomplexity.MethodCyclomaticComplexityVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.enumcomparison.EnumComparisonVisitor;
 import com.tsybulka.autorefactoringplugin.inspections.longmethod.LongMethodVisitor;
@@ -44,8 +44,8 @@ public class ProjectAnalysesService {
 	List<ImplementationSmell> collectImplementationSmells(Set<PsiClass> classes) {
 		List<ImplementationSmell> implementationSmellsList = new ArrayList<>();
 
-		EnumComparisonVisitor enumComparisonVisitor = new EnumComparisonVisitor(implementationSmellsList);
-		ObjectComparisonVisitor objectComparisonVisitor = new ObjectComparisonVisitor(implementationSmellsList);
+		EnumComparisonVisitor enumComparisonVisitor = new EnumComparisonVisitor();
+		ObjectComparisonVisitor objectComparisonVisitor = new ObjectComparisonVisitor();
 		ObjectMethodParameterVisitor objectMethodParameterVisitor = new ObjectMethodParameterVisitor(implementationSmellsList);
 		MethodCyclomaticComplexityVisitor cyclomaticComplexityVisitor = new MethodCyclomaticComplexityVisitor(implementationSmellsList);
 		RepeatedObjectCreationVisitor repeatedObjectCreationVisitor = new RepeatedObjectCreationVisitor(implementationSmellsList);
@@ -62,6 +62,9 @@ public class ProjectAnalysesService {
 					element.accept(cyclomaticComplexityVisitor);
 					element.accept(repeatedObjectCreationVisitor);
 					element.accept(longMethodVisitor);
+
+					implementationSmellsList.addAll(enumComparisonVisitor.getSmellsList());
+					implementationSmellsList.addAll(objectComparisonVisitor.getSmellsList());
 				}
 			});
 
@@ -92,7 +95,7 @@ public class ProjectAnalysesService {
 	List<TestSmell> collectTestSmells(Set<PsiClass> classes) {
 		List<TestSmell> testSmellsList = new ArrayList<>();
 
-		TestMethodNamingVisitor testMethodNamingVisitor = new TestMethodNamingVisitor(testSmellsList);
+		TestMethodNamingVisitor testMethodNamingVisitor = new TestMethodNamingVisitor();
 
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new PsiRecursiveElementVisitor() {
@@ -100,6 +103,7 @@ public class ProjectAnalysesService {
 				public void visitElement(@NotNull PsiElement element) {
 					super.visitElement(element);
 					element.accept(testMethodNamingVisitor);
+					testSmellsList.addAll(testMethodNamingVisitor.getSmellsList());
 				}
 			});
 		}

@@ -3,8 +3,8 @@ package com.tsybulka.autorefactoringplugin.inspections.objectparameter;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 
@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ObjectMethodParameterVisitor extends CodeInspectionVisitor {
+public class ObjectMethodParameterVisitor extends BaseCodeInspectionVisitor {
 
 	private static final String NAME = InspectionsBundle.message("inspection.object.parameter.display.name");
 

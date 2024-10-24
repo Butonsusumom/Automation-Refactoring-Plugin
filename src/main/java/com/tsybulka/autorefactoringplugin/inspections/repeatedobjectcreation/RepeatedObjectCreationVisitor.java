@@ -5,15 +5,15 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
-import com.tsybulka.autorefactoringplugin.inspections.CodeInspectionVisitor;
-import com.tsybulka.autorefactoringplugin.inspections.InspectionsBundle;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class RepeatedObjectCreationVisitor extends CodeInspectionVisitor {
+public class RepeatedObjectCreationVisitor extends BaseCodeInspectionVisitor {
 
 	private static final String NAME = InspectionsBundle.message("inspection.repeated.object.creation.display.name");
 	private static final String DESCRIPTION = InspectionsBundle.message("inspection.repeated.object.creation.problem.descriptor");
