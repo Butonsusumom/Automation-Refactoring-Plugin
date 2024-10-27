@@ -44,8 +44,8 @@ public class ProjectAnalysesService {
 	List<ImplementationSmell> collectImplementationSmells(Set<PsiClass> classes) {
 		List<ImplementationSmell> implementationSmellsList = new ArrayList<>();
 
-		EnumComparisonVisitor enumComparisonVisitor = new EnumComparisonVisitor();
-		ObjectComparisonVisitor objectComparisonVisitor = new ObjectComparisonVisitor();
+		EnumComparisonVisitor enumComparisonVisitor = new EnumComparisonVisitor(implementationSmellsList);
+		ObjectComparisonVisitor objectComparisonVisitor = new ObjectComparisonVisitor(implementationSmellsList);
 		ObjectMethodParameterVisitor objectMethodParameterVisitor = new ObjectMethodParameterVisitor(implementationSmellsList);
 		MethodCyclomaticComplexityVisitor cyclomaticComplexityVisitor = new MethodCyclomaticComplexityVisitor(implementationSmellsList);
 		RepeatedObjectCreationVisitor repeatedObjectCreationVisitor = new RepeatedObjectCreationVisitor(implementationSmellsList);
@@ -63,8 +63,9 @@ public class ProjectAnalysesService {
 					element.accept(repeatedObjectCreationVisitor);
 					element.accept(longMethodVisitor);
 
-					implementationSmellsList.addAll(enumComparisonVisitor.getSmellsList());
-					implementationSmellsList.addAll(objectComparisonVisitor.getSmellsList());
+					//implementationSmellsList.addAll(enumComparisonVisitor.getSmellsList());
+					//implementationSmellsList.addAll(objectComparisonVisitor.getSmellsList());
+					//implementationSmellsList.addAll(objectMethodParameterVisitor.getSmellsList());
 				}
 			});
 
@@ -82,7 +83,8 @@ public class ProjectAnalysesService {
 				@Override
 				public void visitElement(@NotNull PsiElement element) {
 					super.visitElement(element);
-					element.accept(new ScatteredFunctionalityVisitor(seenCodeBlocks));
+					ScatteredFunctionalityVisitor visitor = new ScatteredFunctionalityVisitor(seenCodeBlocks);
+					element.accept(visitor);
 				}
 			});
 		}
@@ -95,7 +97,7 @@ public class ProjectAnalysesService {
 	List<TestSmell> collectTestSmells(Set<PsiClass> classes) {
 		List<TestSmell> testSmellsList = new ArrayList<>();
 
-		TestMethodNamingVisitor testMethodNamingVisitor = new TestMethodNamingVisitor();
+		TestMethodNamingVisitor testMethodNamingVisitor = new TestMethodNamingVisitor(testSmellsList);
 
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new PsiRecursiveElementVisitor() {
@@ -103,7 +105,7 @@ public class ProjectAnalysesService {
 				public void visitElement(@NotNull PsiElement element) {
 					super.visitElement(element);
 					element.accept(testMethodNamingVisitor);
-					testSmellsList.addAll(testMethodNamingVisitor.getSmellsList());
+					//testSmellsList.addAll(testMethodNamingVisitor.getSmellsList());
 				}
 			});
 		}

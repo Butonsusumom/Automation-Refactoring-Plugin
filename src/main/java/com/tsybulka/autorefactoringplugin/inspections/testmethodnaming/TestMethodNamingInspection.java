@@ -6,11 +6,13 @@ import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethod;
 import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspection;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.test.TestSmell;
 import org.jetbrains.annotations.NotNull;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +41,7 @@ public class TestMethodNamingInspection extends BaseCodeInspection {
 		return true;
 	}
 
-	protected LocalQuickFix getQuickFix(){
+	protected BaseCodeInspectionQuickFix getQuickFix(){
 		return new TestMethodNamingFix();
 	}
 
@@ -49,9 +51,9 @@ public class TestMethodNamingInspection extends BaseCodeInspection {
 		return new JavaElementVisitor() {
 			@Override
 			public void visitMethod(PsiMethod method) {
-				TestMethodNamingVisitor visitor = new TestMethodNamingVisitor();
+				List<TestSmell> codeSmells = new ArrayList<>();
+				TestMethodNamingVisitor visitor = new TestMethodNamingVisitor(codeSmells);
 				method.accept(visitor);
-				List<TestSmell> codeSmells = visitor.getSmellsList();
 				for (TestSmell smell : codeSmells) {
 					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), getQuickFix());
 				}

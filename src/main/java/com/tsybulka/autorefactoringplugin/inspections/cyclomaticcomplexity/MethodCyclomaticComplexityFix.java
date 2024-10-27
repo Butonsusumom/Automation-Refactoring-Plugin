@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIfStatement;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.siyeh.ig.classmetrics.CyclomaticComplexityVisitor;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
 import org.apache.commons.lang3.ArrayUtils;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import org.jetbrains.annotations.Nls;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class MethodCyclomaticComplexityFix implements LocalQuickFix {
+public class MethodCyclomaticComplexityFix extends BaseCodeInspectionQuickFix {
 
 	private static final String FIX_MESSAGE = InspectionsBundle.message("inspection.cyclomatic.complexity.use.quickfix");
 

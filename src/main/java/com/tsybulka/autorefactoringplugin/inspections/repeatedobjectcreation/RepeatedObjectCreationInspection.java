@@ -3,6 +3,8 @@ package com.tsybulka.autorefactoringplugin.inspections.repeatedobjectcreation;
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.*;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspection;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
@@ -14,9 +16,11 @@ import java.util.List;
 /**
  * Finds Object parameter where only 1 filed used in method
  */
-public class RepeatedObjectCreationInspection extends AbstractBaseJavaLocalInspectionTool {
+public class RepeatedObjectCreationInspection extends BaseCodeInspection {
 
-	private final RepeatedObjectConstantQuickFix quickFix = new RepeatedObjectConstantQuickFix();
+	protected BaseCodeInspectionQuickFix getQuickFix() {
+		return new RepeatedObjectConstantQuickFix();
+	}
 
 	private static final String NAME = InspectionsBundle.message("inspection.repeated.object.creation.display.name");
 
@@ -58,7 +62,7 @@ public class RepeatedObjectCreationInspection extends AbstractBaseJavaLocalInspe
 
 				// Process smellsList after the visitor has analyzed the file
 				for (ImplementationSmell smell : smellsList) {
-					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), quickFix);
+					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), getQuickFix());
 				}
 			}
 		};

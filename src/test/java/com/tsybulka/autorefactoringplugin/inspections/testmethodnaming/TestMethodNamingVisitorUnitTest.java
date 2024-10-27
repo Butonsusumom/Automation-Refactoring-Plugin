@@ -33,7 +33,7 @@ class TestMethodNamingVisitorUnitTest extends LightPlatformCodeInsightFixture4Te
 		when(PluginSettings.getInstance()).thenReturn(pluginSettings);
 		when(pluginSettings.getTestMethodNamingRegExp()).thenReturn("test[A-Za-z]+");
 
-		classUnderTest = spy(new TestMethodNamingVisitor());
+		classUnderTest = spy(new TestMethodNamingVisitor(any()));
 
 		mockedSettings.close();
 	}

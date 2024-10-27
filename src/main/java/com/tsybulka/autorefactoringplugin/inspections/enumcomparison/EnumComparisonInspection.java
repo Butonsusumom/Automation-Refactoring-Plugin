@@ -6,11 +6,13 @@ import com.intellij.psi.JavaElementVisitor;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspection;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public class EnumComparisonInspection extends BaseCodeInspection {
 	}
 
 	@Override
-	protected LocalQuickFix getQuickFix() {
+	protected BaseCodeInspectionQuickFix getQuickFix() {
 		return new EnumComparisonFix();
 	}
 
@@ -46,9 +48,9 @@ public class EnumComparisonInspection extends BaseCodeInspection {
 		return new JavaElementVisitor() {
 			@Override
 			public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-				EnumComparisonVisitor visitor = new EnumComparisonVisitor();
+				List<ImplementationSmell> codeSmells = new ArrayList<>();
+				EnumComparisonVisitor visitor = new EnumComparisonVisitor(codeSmells);
 				expression.accept(visitor);
-				List<ImplementationSmell> codeSmells = visitor.getSmellsList();
 				for (ImplementationSmell smell : codeSmells) {
 					holder.registerProblem(smell.getPsiElement(), smell.getDescription(), getQuickFix());
 				}

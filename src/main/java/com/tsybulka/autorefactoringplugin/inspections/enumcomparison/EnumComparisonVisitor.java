@@ -28,6 +28,10 @@ public class EnumComparisonVisitor extends BaseCodeInspectionVisitor {
 
 	private List<ImplementationSmell> smellsList = new ArrayList<>();
 
+	public EnumComparisonVisitor(List<ImplementationSmell> smellsList) {
+		this.smellsList = smellsList;
+	}
+
 	@Override
 	public boolean isInspectionEnabled() {
 		return settings.isEnumComparisonCheck();

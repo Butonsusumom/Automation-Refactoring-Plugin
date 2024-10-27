@@ -11,6 +11,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.MethodReferencesSearch;
 import com.intellij.util.Query;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.inspections.longmethod.attributes.LengthyMetrics;
 import org.apache.commons.lang3.ArrayUtils;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.tsybulka.autorefactoringplugin.inspections.longmethod.LongMethodVisitor.*;
 
-public class LongMethodFix implements LocalQuickFix {
+public class LongMethodFix extends BaseCodeInspectionQuickFix {
 
 	private static final String FIX_MESSAGE = InspectionsBundle.message("inspection.long.method.use.quickfix");
 

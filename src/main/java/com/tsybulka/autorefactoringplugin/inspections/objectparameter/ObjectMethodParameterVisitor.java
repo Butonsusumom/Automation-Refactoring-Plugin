@@ -1,22 +1,30 @@
 package com.tsybulka.autorefactoringplugin.inspections.objectparameter;
 
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionVisitor;
+import com.tsybulka.autorefactoringplugin.util.PsiElementsUtils;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmellType;
 import com.tsybulka.autorefactoringplugin.model.smell.codesmell.implementation.ImplementationSmell;
+import lombok.Getter;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+/**
+ * Visitor class for inspecting methods for implementation smells related to
+ * object parameters, specifically when only a single field of the object
+ * is accessed.
+ */
+@Getter
 public class ObjectMethodParameterVisitor extends BaseCodeInspectionVisitor {
+
+	private static final String GET_METHOD_PREFIX = "get";
+	private static final String IS_METHOD_PREFIX = "is";
 
 	private static final String NAME = InspectionsBundle.message("inspection.object.parameter.display.name");
 
-	private List<ImplementationSmell> smellsList;
+	private List<ImplementationSmell> smellsList = new ArrayList<>();
 
 	public ObjectMethodParameterVisitor(List<ImplementationSmell> smellsList) {
 		this.smellsList = smellsList;
@@ -31,114 +39,151 @@ public class ObjectMethodParameterVisitor extends BaseCodeInspectionVisitor {
 	public void visitMethod(PsiMethod method) {
 		if (isInspectionEnabled()) {
 			super.visitMethod(method);
+			analyzeMethodParameters(method);
+		}
+	}
 
-			// Get method parameters
-			PsiParameterList parameterList = method.getParameterList();
-			for (PsiParameter parameter : parameterList.getParameters()) {
-				if (!(parameter.getType() instanceof PsiPrimitiveType)) {
-					// Analyze method body to determine accessed properties from parameters
-					Set<PsiField> accessedProperties = new HashSet<>();
-					Set<String> methodCalls = new HashSet<>();
-					method.accept(new JavaRecursiveElementVisitor() {
-						@Override
-						public void visitReferenceExpression(PsiReferenceExpression expression) {
-							super.visitReferenceExpression(expression);
-							PsiElement resolved = expression.resolve();
-							if (resolved instanceof PsiField && isParameterOfObject(parameter, resolved)) {
-								accessedProperties.add((PsiField) resolved);
-							} else if (resolved instanceof PsiMethod) {
-								PsiMethod resolvedMethod = (PsiMethod) resolved;
-								if (isGetterMethod(resolvedMethod)) {
-									PsiField objectField = resolveGetterField(resolvedMethod);
-									if (isParameterOfObject(parameter, objectField)) {
-										accessedProperties.add(objectField);
-									}
-								} else {
-									methodCalls.add(resolvedMethod.getName());
-								}
-							}
-						}
-					});
-
-					// Check if method can be refactored
-					if (accessedProperties.size() == 1 && methodCalls.isEmpty()) {
-						PsiField property = accessedProperties.iterator().next();
-						registerSmell(method, property, parameter);
-					}
-				}
+	/**
+	 * Analyzes the parameters of the specified method to identify if they are
+	 * object parameters with only a single accessed field.
+	 *
+	 * @param method The method being inspected.
+	 */
+	private void analyzeMethodParameters(PsiMethod method) {
+		PsiParameterList parameterList = method.getParameterList();
+		for (PsiParameter parameter : parameterList.getParameters()) {
+			if (!(parameter.getType() instanceof PsiPrimitiveType)) {
+				Set<PsiField> accessedProperties = retrieveAccessedProperties(method, parameter);
+				checkForSmell(method, accessedProperties, parameter);
 			}
 		}
 	}
 
+	/**
+	 * Analyzes the method body to determine which properties are accessed
+	 * from the given parameter.
+	 *
+	 * @param method   The method being inspected.
+	 * @param parameter The parameter to analyze.
+	 * @return A set of accessed properties as PsiField objects.
+	 */
+	private Set<PsiField> retrieveAccessedProperties(PsiMethod method, PsiParameter parameter) {
+		Set<PsiField> accessedProperties = new HashSet<>();
+		Set<String> methodCalls = new HashSet<>();
+
+		method.accept(new JavaRecursiveElementVisitor() {
+			@Override
+			public void visitReferenceExpression(PsiReferenceExpression expression) {
+				super.visitReferenceExpression(expression);
+				handleReferenceExpression(expression, parameter, accessedProperties, methodCalls);
+			}
+		});
+
+		return accessedProperties;
+	}
+
+	/**
+	 * Handles the reference expressions found in the method body, updating
+	 * the accessed properties and method calls accordingly.
+	 *
+	 * @param expression      The reference expression being visited.
+	 * @param parameter       The parameter being analyzed.
+	 * @param accessedProperties A set to collect accessed properties.
+	 * @param methodCalls     A set to collect method calls.
+	 */
+	private void handleReferenceExpression(PsiReferenceExpression expression, PsiParameter parameter,
+										   Set<PsiField> accessedProperties, Set<String> methodCalls) {
+		PsiElement resolved = expression.resolve();
+		if (resolved instanceof PsiField && PsiElementsUtils.isParameterOfObject(parameter, resolved)) {
+			accessedProperties.add((PsiField) resolved);
+		} else if (resolved instanceof PsiMethod) {
+			handleMethodReference((PsiMethod) resolved, parameter, accessedProperties, methodCalls);
+		}
+	}
+
+	/**
+	 * Handles method references found in the method body, checking if they
+	 * are getter methods and updating accessed properties accordingly.
+	 *
+	 * @param resolvedMethod  The resolved method reference.
+	 * @param parameter       The parameter being analyzed.
+	 * @param accessedProperties A set to collect accessed properties.
+	 * @param methodCalls     A set to collect method calls.
+	 */
+	private void handleMethodReference(PsiMethod resolvedMethod, PsiParameter parameter,
+									   Set<PsiField> accessedProperties, Set<String> methodCalls) {
+		if (PsiElementsUtils.isGetterMethod(resolvedMethod)) {
+			PsiField objectField = resolveGetterField(resolvedMethod);
+			if (PsiElementsUtils.isParameterOfObject(parameter, objectField)) {
+				accessedProperties.add(objectField);
+			}
+		} else {
+			methodCalls.add(resolvedMethod.getName());
+		}
+	}
+
+	/**
+	 * Checks if the method can be refactored based on the accessed properties
+	 * and registers a smell if appropriate.
+	 *
+	 * @param method           The method being inspected.
+	 * @param accessedProperties A set of accessed properties.
+	 * @param parameter        The parameter being analyzed.
+	 */
+	private void checkForSmell(PsiMethod method, Set<PsiField> accessedProperties, PsiParameter parameter) {
+		if (accessedProperties.size() == 1) {
+			PsiField property = accessedProperties.iterator().next();
+			registerSmell(method, property, parameter);
+		}
+	}
+
+	/**
+	 * Resolves the field corresponding to a getter method.
+	 *
+	 * @param getterMethod The getter method to resolve.
+	 * @return The corresponding field, or null if not found.
+	 */
 	private PsiField resolveGetterField(PsiMethod getterMethod) {
-		// Check if the method is a getter method
-		if (isGetterMethod(getterMethod)) {
-			// Extract property name from getter method name
-			String propertyName = getPropertyNameFromGetter(getterMethod);
-			// Find the corresponding field in the class
-			PsiClass containingClass = getterMethod.getContainingClass();
-			if (containingClass != null) {
-				PsiField[] fields = containingClass.getAllFields();
-				for (PsiField field : fields) {
-					if (field.getName().equals(propertyName)) {
-						return field;
-					}
+		if (PsiElementsUtils.isGetterMethod(getterMethod)) {
+			String propertyName = PsiElementsUtils.getPropertyNameFromGetter(getterMethod);
+			return findFieldByName(getterMethod.getContainingClass(), propertyName);
+		}
+		return null;
+	}
+
+	/**
+	 * Finds a field by its name within the specified class.
+	 *
+	 * @param containingClass The class containing the field.
+	 * @param fieldName      The name of the field to find.
+	 * @return The corresponding field, or null if not found.
+	 */
+	private PsiField findFieldByName(PsiClass containingClass, String fieldName) {
+		if (containingClass != null) {
+			for (PsiField field : containingClass.getAllFields()) {
+				if (field.getName().equals(fieldName)) {
+					return field;
 				}
 			}
 		}
 		return null;
 	}
 
-	private static String getPropertyNameFromGetter(PsiMethod method) {
-		// Extract property name from getter method name
-		String name = method.getName();
-		if (name.startsWith("get")) {
-			return StringUtil.decapitalize(name.substring(3));
-		} else if (name.startsWith("is")) {
-			return StringUtil.decapitalize(name.substring(2));
-		}
-		return null;
-	}
-
-	private boolean isParameterOfObject(PsiParameter parameter, PsiElement resolvedElement) {
-		// Check if the resolved element is a field of the parameter's type
-		PsiType parameterType = parameter.getType();
-		if (parameterType instanceof PsiClassType) {
-			PsiClass parameterClass = ((PsiClassType) parameterType).resolve();
-			if (parameterClass != null) {
-				for (PsiField field : parameterClass.getAllFields()) {
-					if (field.equals(resolvedElement)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean isGetterMethod(PsiMethod method) {
-		// Check if the method is a getter method
-		String name = method.getName();
-		return method.getParameterList().isEmpty() && (name.startsWith("get") || name.startsWith("is")) && method.getReturnType() != null;
-	}
-
-	void registerSmell(PsiMethod method, PsiField property, PsiParameter parameter) {
-		// Find the containing class of the expression
+	/**
+	 * Registers an implementation smell for the given method, property, and parameter.
+	 *
+	 * @param method   The method associated with the smell.
+	 * @param property The property that is accessed.
+	 * @param parameter The parameter that triggers the smell.
+	 */
+	private void registerSmell(PsiMethod method, PsiField property, PsiParameter parameter) {
 		PsiClass containingClass = PsiTreeUtil.getParentOfType(method, PsiClass.class);
-		String className = "";
-		String packageName = "";
+		String className = containingClass != null ? containingClass.getName() : "";
+		String packageName = PsiElementsUtils.getPackageName(containingClass);
 		String methodName = method.getName();
 
-		if (containingClass != null) {
-			className = containingClass.getName();
-			// Find the package name of the class
-			PsiFile containingFile = containingClass.getContainingFile();
-			if (containingFile instanceof PsiJavaFile) {
-				packageName = ((PsiJavaFile) containingFile).getPackageName();
-			}
-		}
-
-		smellsList.add(new ImplementationSmell(NAME, packageName, InspectionsBundle.message("inspection.object.parameter.problem.descriptor", property.getName()), ImplementationSmellType.OBJECT_METHOD_PARAMETER, parameter, className, methodName));
-
+		smellsList.add(new ImplementationSmell(NAME, packageName,
+				InspectionsBundle.message("inspection.object.parameter.problem.descriptor", property.getName()),
+				ImplementationSmellType.OBJECT_METHOD_PARAMETER, parameter, className, methodName));
 	}
 }

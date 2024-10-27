@@ -19,6 +19,6 @@ import com.intellij.codeInspection.LocalQuickFix;
  */
 public abstract class BaseCodeInspection extends AbstractBaseJavaLocalInspectionTool{
 
-	protected abstract LocalQuickFix getQuickFix();
+	protected abstract BaseCodeInspectionQuickFix getQuickFix();
 
 }

@@ -29,6 +29,10 @@ public class TestMethodNamingVisitor extends BaseCodeInspectionVisitor {
 
 	private List<TestSmell> smellsList = new ArrayList<>();
 
+	public TestMethodNamingVisitor(List<TestSmell> smellsList) {
+		this.smellsList = smellsList;
+	}
+
 	/**
 	 * Always enabled
 	 */
@@ -81,7 +85,7 @@ public class TestMethodNamingVisitor extends BaseCodeInspectionVisitor {
 		PsiClass containingClass = PsiTreeUtil.getParentOfType(method, PsiClass.class);
 		String packageName = PsiElementsUtils.getPackageName(containingClass);
 		String methodName = method.getName();
-		String className = containingClass.getName();
+		String className = containingClass != null ? containingClass.getName() : "";
 
 		smellsList.add(new TestSmell(NAME, packageName, InspectionsBundle.message("inspection.test.method.name.problem.descriptor", testNamingRegExp), TestSmellType.TEST_METHOD_NAMING, method.getNameIdentifier(), className, methodName));
 	}

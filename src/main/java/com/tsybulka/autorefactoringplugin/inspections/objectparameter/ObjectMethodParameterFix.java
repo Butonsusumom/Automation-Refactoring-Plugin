@@ -1,14 +1,15 @@
 package com.tsybulka.autorefactoringplugin.inspections.objectparameter;
 
-import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
+import com.tsybulka.autorefactoringplugin.util.PsiElementsUtils;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
-import com.tsybulka.autorefactoringplugin.projectanalyses.MetricsCalculationService;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -17,10 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ObjectMethodParameterFix implements LocalQuickFix {
-
-	@SafeFieldForPreview
-	private final MetricsCalculationService metricsCalculationService = new MetricsCalculationService();
+/**
+ * The class provides a quick fix for the object method parameter smell
+ * identified during code inspections. This fix replaces method parameters of object types with the corresponding
+ * field of that object type when only one field is accessed within a method.
+ */
+public class ObjectMethodParameterFix extends BaseCodeInspectionQuickFix {
 
 	@Nls
 	@NotNull
@@ -31,33 +34,38 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 
 	@Override
 	public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
-		PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
 		PsiParameter parameter = (PsiParameter) problemDescriptor.getPsiElement();
-		PsiMethod containingMethod = findContainingMethod(parameter);
-		List<PsiMethodCallExpression> methodCalls = findMethodCallsUsingParameter(project, containingMethod);
-		int parameterIndex = getParameterIndex(parameter, containingMethod);
+		PsiMethod containingMethod = PsiTreeUtil.getParentOfType(parameter, PsiMethod.class);
+		if (containingMethod == null) {
+			return;
+		}
+		PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
 		PsiField field = replaceFieldUsageWithParameter(parameter, factory, containingMethod);
 		if (field != null) {
 			replaceParameterWithField(factory, parameter, field);
+			List<PsiMethodCallExpression> methodCalls = findMethodCallsUsingParameter(project, containingMethod);
+			int parameterIndex = getParameterIndex(parameter, containingMethod);
 			adjustMethodCalls(methodCalls, parameterIndex, field, factory);
 		}
 	}
 
+	/**
+	 * Adjusts method calls that are using the specified parameter by replacing
+	 * the parameter with the field access expression.
+	 *
+	 * @param methodCalls    the list of method calls to adjust
+	 * @param parameterIndex the index of the parameter in the method call
+	 * @param field          the field to replace the parameter with
+	 * @param factory        the factory used to create new expressions
+	 */
 	private void adjustMethodCalls(List<PsiMethodCallExpression> methodCalls, int parameterIndex, PsiField field, PsiElementFactory factory) {
 		for (PsiMethodCallExpression callExpression : methodCalls) {
 			try {
 				PsiExpressionList argumentList = callExpression.getArgumentList();
 				PsiExpression[] arguments = argumentList.getExpressions();
 
-				if (parameterIndex != -1 && parameterIndex < arguments.length) {
-					String fieldName = field.getName();
-					StringBuilder stringBuilder = new StringBuilder(arguments[parameterIndex].getText()).append(".");
-					if (isFieldPublic(field)){
-						stringBuilder.append(fieldName);
-					} else {
-						stringBuilder.append("get").append(StringUtils.capitalize(fieldName)).append("()");
-					}
-					PsiExpression fieldAccessExpression = factory.createExpressionFromText(stringBuilder.toString(), null);
+				if (parameterIndex >= 0 && parameterIndex < arguments.length) {
+					PsiExpression fieldAccessExpression = createFieldAccessExpression(field, factory, arguments[parameterIndex]);
 					arguments[parameterIndex].replace(fieldAccessExpression);
 				}
 			} catch (IncorrectOperationException e) {
@@ -66,23 +74,51 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 		}
 	}
 
-	public boolean isFieldPublic(PsiField field) {
-		if (field != null) {
-			PsiModifierList modifierList = field.getModifierList();
-			return modifierList != null && modifierList.hasModifierProperty(PsiModifier.PUBLIC);
+	/**
+	 * Creates an expression for accessing the field, using the appropriate
+	 * method call if the field is not public.
+	 *
+	 * @param field    the field to access
+	 * @param factory  the factory used to create expressions
+	 * @param argument the original argument expression
+	 * @return the created field access expression
+	 */
+	private PsiExpression createFieldAccessExpression(PsiField field, PsiElementFactory factory, PsiExpression argument) {
+		String fieldName = field.getName();
+		String fieldAccess;
+
+		if (isFieldPublic(field)) {
+			fieldAccess = fieldName;
+		} else {
+			fieldAccess = "get" + StringUtils.capitalize(fieldName) + "()";
 		}
-		return false;
+
+		return factory.createExpressionFromText(argument.getText() + "." + fieldAccess, null);
 	}
 
+	/**
+	 * Checks if the specified field is public.
+	 *
+	 * @param field the field to check
+	 * @return true if the field is public, false otherwise
+	 */
+	public boolean isFieldPublic(PsiField field) {
+		return field != null && field.hasModifierProperty(PsiModifier.PUBLIC);
+	}
+
+	/**
+	 * Finds all method calls within the project that use the specified parameter.
+	 *
+	 * @param project          the project context
+	 * @param containingMethod the method containing the parameter
+	 * @return a list of method calls using the parameter
+	 */
 	public List<PsiMethodCallExpression> findMethodCallsUsingParameter(Project project, PsiMethod containingMethod) {
 		if (containingMethod == null) {
-			return new ArrayList<>(); // Return an empty list if the method is null
+			return new ArrayList<>();
 		}
-
-		Set<PsiClass> classes = metricsCalculationService.collectPsiClassesFromSrc(project);
-
+		Set<PsiClass> classes = PsiElementsUtils.collectPsiClassesFromSrc(project);
 		List<PsiMethodCallExpression> methodCalls = new ArrayList<>();
-
 		for (PsiClass psiClass : classes) {
 			psiClass.accept(new JavaRecursiveElementVisitor() {
 				@Override
@@ -94,92 +130,126 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 				}
 			});
 		}
-
 		return methodCalls;
 	}
 
+	/**
+	 * Checks if the specified method call expression is calling the target method.
+	 *
+	 * @param callExpression the method call expression
+	 * @param targetMethod   the method to check against
+	 * @return true if it is a call to the target method, false otherwise
+	 */
 	private boolean isCallOfMethod(PsiMethodCallExpression callExpression, PsiMethod targetMethod) {
 		if (callExpression == null || targetMethod == null) {
-			return false; // Return false if either parameter is null
+			return false;
 		}
-
 		PsiMethod resolvedMethod = callExpression.resolveMethod();
 		return resolvedMethod != null && resolvedMethod.equals(targetMethod);
 	}
 
+	/**
+	 * Replaces the parameter with a new field in the method's body.
+	 *
+	 * @param factory   the factory to create new parameters
+	 * @param parameter the parameter to replace
+	 * @param field     the field to replace with
+	 */
 	private void replaceParameterWithField(PsiElementFactory factory, PsiParameter parameter, PsiField field) {
 		try {
 			PsiParameter newParameter = factory.createParameter(field.getName(), field.getType());
 			parameter.replace(newParameter);
 		} catch (IncorrectOperationException e) {
-			e.printStackTrace();
+			Logger.getInstance(ObjectMethodParameterFix.class).error("Failed to replace parameter with field", e);
 		}
 	}
 
+	/**
+	 * Replaces the field usage in the method with the parameter.
+	 *
+	 * @param parameter the parameter to analyze
+	 * @param factory   the factory to create new expressions
+	 * @param method    the method containing the parameter
+	 * @return the replaced field or null if none was found
+	 */
 	private PsiField replaceFieldUsageWithParameter(PsiParameter parameter, PsiElementFactory factory, PsiMethod method) {
-		// Navigate up the PSI tree to find the containing method
 		final PsiField[] objectField = new PsiField[1];
+
 		method.accept(new JavaRecursiveElementVisitor() {
 			@Override
 			public void visitReferenceExpression(PsiReferenceExpression expression) {
 				super.visitReferenceExpression(expression);
-				PsiElement resolved = expression.resolve();
-				if (resolved instanceof PsiField && isParameterOfObject(parameter, resolved)) {
-					objectField[0] = (PsiField) resolved;
-					expression.replace(factory.createExpressionFromText(objectField[0].getName(), null));
-				} else if (resolved instanceof PsiMethod && isGetterMethod((PsiMethod) resolved)) {
-					objectField[0] = resolveGetterField((PsiMethod) resolved);
-					PsiMethodCallExpression methodCall = getMethodCallFromReference(expression);
-					if (isParameterOfObject(parameter, objectField[0])) {
-						if (methodCall != null) {
-							methodCall.replace(factory.createExpressionFromText(objectField[0].getName(), null));
-
-						}
-					}
-				}
+				handleReferenceExpression(expression, parameter, objectField, factory);
 			}
 		});
+
 		return objectField[0];
 	}
 
+	/**
+	 * Handles the reference expression for possible field and getter method calls.
+	 *
+	 * @param expression  the reference expression
+	 * @param parameter   the parameter being analyzed
+	 * @param objectField an array holding the found field
+	 * @param factory     the factory to create new expressions
+	 */
+	private void handleReferenceExpression(PsiReferenceExpression expression, PsiParameter parameter, PsiField[] objectField, PsiElementFactory factory) {
+		PsiElement resolved = expression.resolve();
+		if (resolved instanceof PsiField && PsiElementsUtils.isParameterOfObject(parameter, resolved)) {
+			objectField[0] = (PsiField) resolved;
+			expression.replace(factory.createExpressionFromText(objectField[0].getName(), null));
+		} else if (resolved instanceof PsiMethod && PsiElementsUtils.isGetterMethod((PsiMethod) resolved)) {
+			objectField[0] = resolveGetterField((PsiMethod) resolved);
+			PsiMethodCallExpression methodCall = getMethodCallFromReference(expression);
+			if (PsiElementsUtils.isParameterOfObject(parameter, objectField[0]) && methodCall != null) {
+				methodCall.replace(factory.createExpressionFromText(objectField[0].getName(), null));
+			}
+		}
+	}
+
+	/**
+	 * Gets the index of the specified parameter in the containing method.
+	 *
+	 * @param parameter        the parameter to find
+	 * @param containingMethod the method containing the parameter
+	 * @return the index of the parameter, or -1 if not found
+	 */
 	public static int getParameterIndex(PsiParameter parameter, PsiMethod containingMethod) {
 		if (containingMethod != null) {
 			PsiParameter[] parameters = containingMethod.getParameterList().getParameters();
 			for (int i = 0; i < parameters.length; i++) {
 				if (parameter.equals(parameters[i])) {
-					return i; // Return the index if found
+					return i;
 				}
 			}
 		}
-		return -1; // Return -1 if the parameter is not found or if there is no containing method
+		return -1;
 	}
 
+	/**
+	 * Gets the method call expression from the reference expression's parent.
+	 *
+	 * @param referenceExpression the reference expression
+	 * @return the method call expression, or null if not found
+	 */
 	private PsiMethodCallExpression getMethodCallFromReference(PsiReferenceExpression referenceExpression) {
 		PsiElement parent = referenceExpression.getParent();
-		if (parent instanceof PsiMethodCallExpression) {
-			return (PsiMethodCallExpression) parent;
-		}
-		return null;
+		return parent instanceof PsiMethodCallExpression ? (PsiMethodCallExpression) parent : null;
 	}
 
-	private PsiMethod findContainingMethod(PsiElement element) {
-		// Navigate up the PSI tree until a method is found
-		while (element != null && !(element instanceof PsiMethod)) {
-			element = element.getParent();
-		}
-		return (PsiMethod) element; // This may return null if no method is found
-	}
-
+	/**
+	 * Resolves the field corresponding to the given getter method.
+	 *
+	 * @param getterMethod the getter method to analyze
+	 * @return the corresponding field, or null if not found
+	 */
 	private PsiField resolveGetterField(PsiMethod getterMethod) {
-		// Check if the method is a getter method
-		if (isGetterMethod(getterMethod)) {
-			// Extract property name from getter method name
-			String propertyName = getPropertyNameFromGetter(getterMethod);
-			// Find the corresponding field in the class
+		if (PsiElementsUtils.isGetterMethod(getterMethod)) {
+			String propertyName = PsiElementsUtils.getPropertyNameFromGetter(getterMethod);
 			PsiClass containingClass = getterMethod.getContainingClass();
 			if (containingClass != null) {
-				PsiField[] fields = containingClass.getAllFields();
-				for (PsiField field : fields) {
+				for (PsiField field : containingClass.getAllFields()) {
 					if (field.getName().equals(propertyName)) {
 						return field;
 					}
@@ -189,36 +259,4 @@ public class ObjectMethodParameterFix implements LocalQuickFix {
 		return null;
 	}
 
-	private static String getPropertyNameFromGetter(PsiMethod method) {
-		// Extract property name from getter method name
-		String name = method.getName();
-		if (name.startsWith("get")) {
-			return StringUtil.decapitalize(name.substring(3));
-		} else if (name.startsWith("is")) {
-			return StringUtil.decapitalize(name.substring(2));
-		}
-		return null;
-	}
-
-	private boolean isParameterOfObject(PsiParameter parameter, PsiElement resolvedElement) {
-		// Check if the resolved element is a field of the parameter's type
-		PsiType parameterType = parameter.getType();
-		if (parameterType instanceof PsiClassType) {
-			PsiClass parameterClass = ((PsiClassType) parameterType).resolve();
-			if (parameterClass != null) {
-				for (PsiField field : parameterClass.getAllFields()) {
-					if (field.equals(resolvedElement)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean isGetterMethod(PsiMethod method) {
-		// Check if the method is a getter method
-		String name = method.getName();
-		return method.getParameterList().isEmpty() && (name.startsWith("get") || name.startsWith("is")) && method.getReturnType() != null;
-	}
 }

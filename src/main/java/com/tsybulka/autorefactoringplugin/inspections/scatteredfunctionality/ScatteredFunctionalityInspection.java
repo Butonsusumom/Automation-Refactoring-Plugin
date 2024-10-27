@@ -5,6 +5,8 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspection;
+import com.tsybulka.autorefactoringplugin.inspections.BaseCodeInspectionQuickFix;
 import com.tsybulka.autorefactoringplugin.util.messagebundles.InspectionsBundle;
 import com.tsybulka.autorefactoringplugin.model.smell.SmellType;
 import com.tsybulka.autorefactoringplugin.projectanalyses.MetricsCalculationService;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Finds scattered functionality across project
  */
-public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspectionTool {
+public class ScatteredFunctionalityInspection extends BaseCodeInspection {
 
 	private static final String NAME = InspectionsBundle.message("inspection.scattered.functionality.display.name");
 
@@ -37,6 +39,10 @@ public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspe
 		return true;
 	}
 
+	protected BaseCodeInspectionQuickFix getQuickFix() {
+		return null;
+	}
+
 	@NotNull
 	@Override
 	public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
@@ -52,7 +58,8 @@ public class ScatteredFunctionalityInspection extends AbstractBaseJavaLocalInspe
 				@Override
 				public void visitElement(@NotNull PsiElement element) {
 					super.visitElement(element);
-					element.accept(new ScatteredFunctionalityVisitor(seenCodeBlocks));
+					ScatteredFunctionalityVisitor visitor = new ScatteredFunctionalityVisitor(seenCodeBlocks);
+					element.accept(visitor);
 				}
 			});
 		}

@@ -28,6 +28,10 @@ public class ObjectComparisonVisitor extends BaseCodeInspectionVisitor{
 
 	private List<ImplementationSmell> smellsList = new ArrayList<>();
 
+	public ObjectComparisonVisitor(List<ImplementationSmell> smellsList) {
+		this.smellsList = smellsList;
+	}
+
 	@Override
 	public boolean isInspectionEnabled() {
 		return settings.isObjectComparisonCheck();
